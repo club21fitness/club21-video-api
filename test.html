@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Function Club21</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    
+    .button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .status.loading {
+      display: block;
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      color: #1565c0;
+    }
+    
+    .status.success {
+      display: block;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      color: #2e7d32;
+    }
+    
+    .status.error {
+      display: block;
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+      color: #c62828;
+    }
+    
+    .response-box {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .demo-btn {
+      background: none;
+      border: 1px solid #ddd;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 10px;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    
+    .demo-btn:hover {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 Test Function Netlify</h1>
+    <p class="subtitle">Teste la création de vidéo personnalisée</p>
+    
+    <button class="demo-btn" onclick="fillDemo()">📋 Charger données de test</button>
+    
+    <form id="testForm" style="margin-top: 20px;">
+      <div class="form-group">
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" required placeholder="Ex: Marie">
+      </div>
+      
+      <div class="form-group">
+        <label for="age">Âge</label>
+        <select id="age" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="18-24">18-24</option>
+          <option value="25-34">25-34</option>
+          <option value="35-44">35-44</option>
+          <option value="45+">45+</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="sexe">Sexe</label>
+        <select id="sexe" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="homme">Homme</option>
+          <option value="femme">Femme</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="niveau">Niveau</label>
+        <select id="niveau" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="débutant">Débutant</option>
+          <option value="intermédiaire">Intermédiaire</option>
+          <option value="avancé">Avancé</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="objectif">Objectif</label>
+        <select id="objectif" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="perdre_poids_h">Perdre du poids (H)</option>
+          <option value="mincir_f">Mincir (F)</option>
+          <option value="galber_f">Galber (F)</option>
+          <option value="muscle_h">Muscle (H)</option>
+          <option value="recomposition_h">Recomposition (H)</option>
+          <option value="tonifier_f">Tonifier (F)</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="location">Lieu</label>
+        <select id="location" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="maison">Maison</option>
+          <option value="salle">Salle</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="sessions">Séances</label>
+        <select id="sessions" required>
+          <option value="">-- Sélectionne --</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="button">🚀 Tester la Function</button>
+    </form>
+    
+    <div id="status" class="status">
+      <div id="statusText"></div>
+      <div id="responseBox" class="response-box"></div>
+    </div>
+  </div>
+
+  <script>
+    function fillDemo() {
+      document.getElementById('prenom').value = 'Camron';
+      document.getElementById('age').value = '25-34';
+      document.getElementById('sexe').value = 'homme';
+      document.getElementById('niveau').value = 'avancé';
+      document.getElementById('objectif').value = 'muscle_h';
+      document.getElementById('location').value = 'salle';
+      document.getElementById('sessions').value = '4';
+    }
+
+    document.getElementById('testForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const statusDiv = document.getElementById('status');
+      const statusText = document.getElementById('statusText');
+      const responseBox = document.getElementById('responseBox');
+
+      statusDiv.className = 'status loading';
+      statusText.textContent = '⏳ Test en cours...';
+      responseBox.textContent = '';
+
+      const payload = {
+        prenom: document.getElementById('prenom').value,
+        answers: {
+          age: document.getElementById('age').value,
+          sexe: document.getElementById('sexe').value,
+          niveau: document.getElementById('niveau').value,
+          objectif: document.getElementById('objectif').value,
+          location: document.getElementById('location').value,
+          sessions: document.getElementById('sessions').value
+        }
+      };
+
+      try {
+        const response = await fetch('/.netlify/functions/create-video-ffmpeg', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusDiv.className = 'status success';
+          statusText.textContent = '✅ Vidéo créée avec succès !';
+          responseBox.textContent = JSON.stringify(data, null, 2);
+        } else {
+          statusDiv.className = 'status error';
+          statusText.textContent = '❌ Erreur';
+          responseBox.textContent = JSON.stringify(data, null, 2);
+        }
+      } catch (error) {
+        statusDiv.className = 'status error';
+        statusText.textContent = '❌ Erreur de connexion';
+        responseBox.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>
