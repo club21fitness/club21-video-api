@@ -1,12 +1,9 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// Initialiser Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
-console.log('SUPABASE_URL:', supabaseUrl);
-console.log('SUPABASE_KEY exists:', !!supabaseKey);
-
+console.log('Initializing Supabase...');
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event) => {
@@ -29,61 +26,15 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Manque prenom ou answers' })
+        body: JSON.stringify({ error: 'Missing prenom or answers' })
       };
     }
 
-    console.log(`✅ Request reçu pour ${prenom}`);
-    console.log('Answers:', answers);
+    console.log(`Request received for ${prenom}`);
 
-    // Test 1: Vérifier la connection Supabase
-    console.log('Test 1: Vérifier connection Supabase...');
-    const { data: testData, error: testError } = await supabase
-      .from('video_queue')
-      .select('count()', { count: 'exact', head: true });
-
-    if (testError) {
-      console.error('Erreur Supabase:', testError);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: 'Supabase connection failed',
-          details: testError.message
-        })
-      };
-    }
-
-    console.log('✅ Connection Supabase OK');
-
-    // Test 2: Simuler la création de vidéo
+    // Simply create a mock response without touching Supabase
     const videoId = `${prenom}_${Date.now()}`;
     const mockVideoUrl = `https://sparkly-gnome-417145.netlify.app/mock-video/${videoId}.mp4`;
-
-    console.log(`✅ Vidéo simulée créée: ${videoId}`);
-
-    // Test 3: Insérer dans la BD (optionnel)
-    try {
-      const { error: insertError } = await supabase
-        .from('video_queue')
-        .insert([
-          {
-            prenom,
-            answers: JSON.stringify(answers),
-            status: 'completed',
-            video_url: mockVideoUrl,
-            created_at: new Date().toISOString()
-          }
-        ]);
-
-      if (insertError) {
-        console.warn('Warning insert:', insertError.message);
-      } else {
-        console.log('✅ Enregistrement inséré dans BD');
-      }
-    } catch (e) {
-      console.warn('Warning BD:', e.message);
-    }
 
     return {
       statusCode: 200,
@@ -94,17 +45,18 @@ exports.handler = async (event) => {
         videoUrl: mockVideoUrl,
         prenom,
         message: '✅ TEST MODE - Vidéo simulée (pas de FFmpeg)',
+        timestamp: new Date().toISOString(),
         answers
       })
     };
   } catch (error) {
-    console.error('Erreur complète:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         error: error.message,
-        details: 'Erreur lors du test de la Function'
+        details: 'Error processing request'
       })
     };
   }
