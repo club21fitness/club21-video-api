@@ -1,0 +1,14 @@
+{
+  "name": "club21-video-api",
+  "version": "1.0.0",
+  "description": "Club21 Personalized Video Generator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "npm install"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
