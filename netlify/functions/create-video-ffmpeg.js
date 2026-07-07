@@ -9,7 +9,11 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Mapper les réponses aux fichiers vidéo (chemins exacts Supabase)
+// CORRIGÉ: sexe converti en h/f pour l'entraînement
 function getVideoSegments(answers) {
+  // Convertir sexe: "homme" → "h", "femme" → "f"
+  const sexeAbbrev = answers.sexe === 'homme' ? 'h' : 'f';
+
   return [
     'segments/intro.mp4',
     
@@ -28,8 +32,8 @@ function getVideoSegments(answers) {
     // Physique
     `segments/physique/${answers.physique}.mp4`,
     
-    // Entraînement (location_sexe_sessions)
-    `segments/entrainement/${answers.location}_${answers.sexe}_${answers.sessions}.mp4`,
+    // Entraînement (location_h/f_sessions) - CORRIGÉ
+    `segments/entrainement/${answers.location}_${sexeAbbrev}_${answers.sessions}.mp4`,
     
     // Nourriture
     `segments/nourriture/${answers.nourriture}.mp4`,
