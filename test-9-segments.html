@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Function Club21 - 9 Segments</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      padding: 40px; 
+      max-width: 900px; 
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+    h1 { color: #F4A91F; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    input, select { 
+      padding: 10px; 
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button { 
+      grid-column: 1 / -1;
+      padding: 15px; 
+      background: #F4A91F; 
+      color: white;
+      border: none; 
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+    button:hover { background: #E69A12; }
+    #result { 
+      margin-top: 30px; 
+      padding: 20px; 
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #F4A91F;
+    }
+    .success { border-left-color: #4CAF50; }
+    .error { border-left-color: #f44336; }
+    a { 
+      color: #F4A91F; 
+      text-decoration: none;
+      word-break: break-all;
+      display: block;
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+    a:hover { text-decoration: underline; }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #F4A91F;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎬 Test Function Club21 - 9 Segments</h1>
+  
+  <div class="form-grid">
+    <input type="text" id="prenom" placeholder="Prénom" value="Marie">
+    <select id="age">
+      <option value="18 - 24 ans">18 - 24 ans</option>
+      <option value="25 - 34 ans" selected>25 - 34 ans</option>
+      <option value="35 - 44 ans">35 - 44 ans</option>
+      <option value="45 - 54 ans">45 - 54 ans</option>
+      <option value="+ de 55 ans">+ de 55 ans</option>
+    </select>
+
+    <select id="sexe">
+      <option value="femme" selected>Femme</option>
+      <option value="homme">Homme</option>
+    </select>
+
+    <select id="niveau">
+      <option value="Débutante">Débutante</option>
+      <option value="Intermédiaire">Intermédiaire</option>
+      <option value="Confirmée" selected>Confirmée</option>
+    </select>
+
+    <select id="objectif">
+      <option value="Mincir">Mincir</option>
+      <option value="Me galber / me tonifier" selected>Me galber / me tonifier</option>
+      <option value="Mix complet">Mix complet</option>
+    </select>
+
+    <select id="physique">
+      <option value="physique_0" selected>Physique 0</option>
+      <option value="physique_1">Physique 1</option>
+      <option value="physique_2">Physique 2</option>
+    </select>
+
+    <select id="lieu">
+      <option value="En salle de sport" selected>En salle de sport</option>
+      <option value="À domicile">À domicile</option>
+    </select>
+
+    <select id="seances">
+      <option value="0 (je débute)">0 (je débute)</option>
+      <option value="1 à 2">1 à 2</option>
+      <option value="3 à 4" selected>3 à 4</option>
+      <option value="5 et +">5 et +</option>
+    </select>
+
+    <select id="blessure">
+      <option value="Le dos">Le dos</option>
+      <option value="Les genoux">Les genoux</option>
+      <option value="Les épaules">Les épaules</option>
+      <option value="Post-grossesse">Post-grossesse</option>
+      <option value="Aucune" selected>Aucune</option>
+    </select>
+
+    <select id="nourriture">
+      <option value="Je mange plutôt équilibré" selected>Je mange plutôt équilibré</option>
+      <option value="Je grignote dès que je stresse">Je grignote dès que je stresse</option>
+      <option value="J'ai des fringales le soir">J'ai des fringales le soir</option>
+      <option value="Je mange mes émotions">Je mange mes émotions</option>
+      <option value="C'est compliqué">C'est compliqué</option>
+    </select>
+
+    <input type="range" id="sommeil" min="0" max="100" value="75" placeholder="Sommeil (0-100)">
+    <span id="sommeilValue">Sommeil: 75</span>
+
+    <button onclick="test()">Tester la Function 🚀</button>
+  </div>
+  
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('sommeil').addEventListener('input', (e) => {
+      document.getElementById('sommeilValue').textContent = `Sommeil: ${e.target.value}`;
+    });
+
+    async function test() {
+      const answers = {
+        prenom: document.getElementById('prenom').value,
+        age: document.getElementById('age').value,
+        sexe: document.getElementById('sexe').value,
+        niveau: document.getElementById('niveau').value,
+        objectif: document.getElementById('objectif').value,
+        physique: document.getElementById('physique').value,
+        lieu: document.getElementById('lieu').value,
+        seances: document.getElementById('seances').value,
+        blessure: document.getElementById('blessure').value,
+        nourriture: document.getElementById('nourriture').value,
+        sommeil: document.getElementById('sommeil').value
+      };
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<div class="spinner"></div> Appel en cours...';
+      resultDiv.className = '';
+
+      try {
+        const response = await fetch('/.netlify/functions/generate-video-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.className = 'success';
+          resultDiv.innerHTML = `
+            <h2>✅ Succès !</h2>
+            <p><strong>Prenom:</strong> ${data.prenom}</p>
+            <p><strong>URL Vidéo Complète (9 segments):</strong></p>
+            <a href="${data.videoUrl}" target="_blank">${data.videoUrl}</a>
+            <p><em>Clique sur le lien pour voir la vidéo avec intro + 9 segments!</em></p>
+            <p><em>⏳ Le premier chargement prend 30-40s (Cloudinary fabrique la vidéo)</em></p>
+          `;
+        } else {
+          resultDiv.className = 'error';
+          resultDiv.innerHTML = `<h2>❌ Erreur</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+      } catch (error) {
+        resultDiv.className = 'error';
+        resultDiv.innerHTML = `<h2>❌ Erreur connexion</h2><pre>${error.message}</pre>`;
+      }
+    }
+  </script>
+</body>
+</html>
