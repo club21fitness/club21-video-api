@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     const blessure = blessureMap[answers.blessure] || 'aucune';
     const nourriture = nourritureMap[answers.nourriture] || 'equilibre';
 
-    // PHYSIQUE : traduction dynamique selon sexe + objectif (comme le quiz)
+    // PHYSIQUE
     let physique = 'equilibre';
     if (answers.physique) {
       let cat;
@@ -108,7 +108,7 @@ exports.handler = async (event) => {
       physique = cat;
     }
 
-    // SOMMEIL : traduire slider 0-100 en catégorie
+    // SOMMEIL
     let sommeil = 'moyen';
     if (answers.sommeil) {
       const v = parseInt(answers.sommeil, 10);
@@ -117,10 +117,10 @@ exports.handler = async (event) => {
       else sommeil = 'tres_bien';
     }
 
-    // ENTRAINEMENT : location_sexe_sessions
+    // ENTRAINEMENT
     const entrainement = `${lieu}_${sexe.charAt(0)}_${seances}`;
 
-    // CONSTRUIRE L'URL AVEC 9 SEGMENTS
+    // URL AVEC 9 SEGMENTS
     const segments = [
       `segments:age:${age}`,
       `segments:sexe:${sexe}`,
@@ -146,8 +146,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         videoUrl,
-        prenom: answers.prenom || 'Utilisateur',
-        debug: { age, sexe, niveau, objectif, physique, entrainement, nourriture, sommeil, blessure }
+        prenom: answers.prenom || 'Utilisateur'
       })
     };
   } catch (error) {
