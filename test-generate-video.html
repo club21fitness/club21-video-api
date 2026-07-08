@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Function Club21</title>
+  <style>
+    body { font-family: Arial; padding: 40px; max-width: 800px; margin: 0 auto; }
+    input, button { padding: 10px; margin: 5px; font-size: 16px; }
+    button { background: #F4A91F; border: none; cursor: pointer; }
+    #result { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px; }
+    a { color: blue; text-decoration: underline; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>Test Function Club21</h1>
+  
+  <input type="text" id="prenom" placeholder="Prénom" value="Marie">
+  <input type="text" id="age" placeholder="Age" value="25 - 34 ans">
+  <input type="text" id="sexe" placeholder="Sexe" value="femme">
+  <input type="text" id="niveau" placeholder="Niveau" value="Confirmée">
+  <input type="text" id="objectif" placeholder="Objectif" value="Me galber / me tonifier">
+  <input type="text" id="physique" placeholder="Physique" value="physique_0">
+  <input type="text" id="lieu" placeholder="Lieu" value="En salle de sport">
+  <input type="text" id="seances" placeholder="Seances" value="3 à 4">
+  <input type="text" id="blessure" placeholder="Blessure" value="Aucune">
+  <input type="text" id="nourriture" placeholder="Nourriture" value="Je mange plutôt équilibré">
+  <input type="text" id="sommeil" placeholder="Sommeil (0-100)" value="75">
+  
+  <button onclick="test()">Tester la Function</button>
+  
+  <div id="result"></div>
+
+  <script>
+    async function test() {
+      const answers = {
+        prenom: document.getElementById('prenom').value,
+        age: document.getElementById('age').value,
+        sexe: document.getElementById('sexe').value,
+        niveau: document.getElementById('niveau').value,
+        objectif: document.getElementById('objectif').value,
+        physique: document.getElementById('physique').value,
+        lieu: document.getElementById('lieu').value,
+        seances: document.getElementById('seances').value,
+        blessure: document.getElementById('blessure').value,
+        nourriture: document.getElementById('nourriture').value,
+        sommeil: document.getElementById('sommeil').value
+      };
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '⏳ Appel en cours...';
+
+      try {
+        const response = await fetch('/.netlify/functions/generate-video-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <h2>✅ Succès !</h2>
+            <p><strong>Prenom:</strong> ${data.prenom}</p>
+            <p><strong>URL Vidéo:</strong></p>
+            <a href="${data.videoUrl}" target="_blank">${data.videoUrl}</a>
+            <p><i>Clique sur le lien pour voir la vidéo (le premier chargement prend 30-40s)</i></p>
+          `;
+        } else {
+          resultDiv.innerHTML = `<h2>❌ Erreur</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<h2>❌ Erreur connexion</h2><pre>${error.message}</pre>`;
+      }
+    }
+  </script>
+</body>
+</html>
