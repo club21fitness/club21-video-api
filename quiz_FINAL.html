@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Club 21 — Quiz</title>
+<style>
+  :root{
+    --cream:#FBF2E6;        /* fond panneau droit */
+    --ink:#34434F;          /* titres */
+    --inksoft:#5A6470;
+    --card:#FFFFFF;
+    --orange:#F4A91F;       /* accent / boutons */
+    --orange-d:#E69A12;
+    --pill:#2B2723;         /* pilule sombre */
+    --line:#F0E9DD;
+    --radius:16px;
+    --shadow:0 3px 14px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#000;overflow:hidden}
+
+  /* ===== Layout split desktop ===== */
+  .stage{position:fixed;inset:0;display:flex}
+  .video-pane{position:relative;width:46%;height:100%;background:#1c1814;overflow:hidden}
+  .q-pane{position:relative;width:54%;height:100%;background:var(--cream);display:flex;
+          flex-direction:column;justify-content:center;padding:30px 56px;overflow:hidden}
+
+  /* ===== Vidéo ===== */
+  .video-pane video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1c1814}
+  .video-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+     background:linear-gradient(135deg,#cdbfaa,#b3a085);color:#6b5e49;font-size:20px}
+
+  .progress-pill{position:absolute;top:22px;left:22px;background:rgba(43,39,35,.92);color:#fff;
+     font-weight:700;font-size:20px;padding:9px 20px;border-radius:22px;z-index:5}
+
+  .controls{position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:5;
+     background:rgba(43,39,35,.9);border-radius:25px;height:50px;display:flex;align-items:center;
+     gap:14px;padding:0 14px}
+  .controls .time{color:#fff;font-size:16px;min-width:78px;text-align:center}
+  .ctrl-btn{width:30px;height:30px;border:none;background:transparent;cursor:pointer;display:flex;
+     align-items:center;justify-content:center;border-radius:50%}
+  .ctrl-btn svg{width:18px;height:18px;fill:#fff}
+  .ctrl-btn.sub{background:var(--orange);width:34px;height:34px}
+  .ctrl-btn.sub svg{fill:#fff;width:18px;height:18px}
+  .ctrl-btn.sub.off{background:rgba(255,255,255,.25)}
+
+  /* gros bouton play (intro) */
+  .big-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6;cursor:pointer}
+  @keyframes haloWave{
+    0%{box-shadow:0 0 0 0 rgba(255,255,255,.8), 0 6px 24px rgba(0,0,0,.3)}
+    50%{box-shadow:0 0 0 20px rgba(255,255,255,0), 0 6px 24px rgba(0,0,0,.3)}
+    100%{box-shadow:0 0 0 0 rgba(255,255,255,.8), 0 6px 24px rgba(0,0,0,.3)}
+  }
+  .big-play .circle{width:86px;height:86px;border-radius:50%;background:rgba(255,255,255,.95);
+     display:flex;align-items:center;justify-content:center;animation:haloWave 2s infinite;cursor:pointer}
+  .big-play .circle svg{width:34px;height:34px;fill:var(--ink);margin-left:5px}
+
+  /* sous-titres (positionnés plus bas) */
+  .caption{position:absolute;left:30px;right:30px;bottom:26px;z-index:4;background:rgba(0,0,0,.62);
+     color:#fff;font-weight:700;font-size:clamp(13px,1.4vw,18px);line-height:1.35;text-align:center;
+     padding:12px 16px;border-radius:10px;display:none}
+  .caption.show{display:block}
+
+  /* ===== Panneau question ===== */
+  .q-title{font-size:clamp(26px,2.9vw,40px);font-weight:800;color:var(--ink);text-align:center;
+     line-height:1.12;margin-bottom:10px}
+  .q-underline{width:80px;height:5px;border-radius:3px;background:var(--orange);margin:0 auto 22px}
+
+  .options{display:flex;flex-direction:column;gap:10px;max-width:560px;width:100%;margin:0 auto}
+  .opt{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+     padding:15px 26px;font-size:20px;color:var(--ink);cursor:pointer;box-shadow:var(--shadow);
+     transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;text-align:left}
+  .opt:hover{transform:translateY(-2px);border-color:var(--orange);box-shadow:0 8px 20px rgba(244,169,31,.18)}
+  .opt.selected{border-color:var(--orange);border-width:2px}
+  /* animation "remplissage" au clic sur une réponse */
+  .opt-fill{position:absolute;inset:0;background:rgba(244,169,31,.20);transform:scaleX(0);
+     transform-origin:left;transition:transform .38s cubic-bezier(.22,.61,.36,1);z-index:0}
+  .opt:hover .opt-fill{transform:scaleX(0.5);transition:transform .2s ease-out}
+  .opt.selected .opt-fill{transform:scaleX(1);transition:transform .38s cubic-bezier(.22,.61,.36,1)}
+  .opt-label{position:relative;z-index:1}
+
+  /* duo (2 cartes côte à côte) */
+  .duo{display:flex;align-items:center;justify-content:center;gap:22px;max-width:600px;margin:0 auto}
+  .duo .opt{flex:1;text-align:center}
+  .duo .sep{color:var(--inksoft);font-size:18px}
+
+  /* sexe */
+  .sex-wrap{display:flex;align-items:center;justify-content:center;gap:60px}
+  .sex-card{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+     width:210px;height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+     gap:14px;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+  .sex-card:hover{transform:translateY(-3px);border-color:var(--orange)}
+  .sex-card .emoji{font-size:46px;position:relative;z-index:1}
+  .sex-card .lbl{font-size:24px;font-weight:700;color:var(--ink);position:relative;z-index:1}
+  .sex-card.selected{border-color:var(--orange);border-width:2px}
+  .sex-card .opt-fill{position:absolute;inset:0;background:rgba(244,169,31,.20);transform:scaleX(0);
+     transform-origin:left;transition:transform .38s cubic-bezier(.22,.61,.36,1);z-index:0}
+  .sex-card:hover .opt-fill{transform:scaleX(0.5);transition:transform .2s ease-out}
+  .sex-card.selected .opt-fill{transform:scaleX(1);transition:transform .38s cubic-bezier(.22,.61,.36,1)}
+
+  /* champ texte / nombre */
+  .field-wrap{max-width:560px;width:100%;margin:0 auto}
+  .field{width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+     padding:26px 30px;font-size:24px;color:var(--ink);box-shadow:var(--shadow);outline:none}
+  .field::placeholder{color:#9aa1a8}
+  .field:focus{border-color:var(--orange)}
+  .field-hint{color:var(--inksoft);font-size:15px;font-style:italic;text-align:center;margin-top:16px;min-height:20px}
+  .field-hint.err{color:#b5462f;font-style:normal;font-weight:600}
+
+  /* images physique */
+  .img-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;max-width:420px;margin:0 auto}
+  .img-grid.img-grid-3{grid-template-columns:repeat(3,1fr);max-width:500px}
+  .img-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;cursor:pointer;
+     box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+  .img-card:hover{transform:translateY(-2px);border-color:var(--orange)}
+  .img-card.selected{border:3px solid var(--orange)}
+  .img-card img,.img-card svg{width:100%;height:160px;object-fit:contain;display:block}
+
+  /* slider */
+  .slider-wrap{max-width:560px;width:100%;margin:0 auto}
+  .slider-labels{display:flex;justify-content:space-between;color:#9a6b1a;font-size:17px;margin-bottom:22px}
+  .slider-labels span{max-width:45%}
+  .slider-labels span:last-child{text-align:right}
+  input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;
+     background:linear-gradient(to right,var(--orange) 0%,var(--orange) 50%,#efe7da 50%,#efe7da 100%);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:32px;border-radius:50%;
+     background:var(--orange);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+  input[type=range]::-moz-range-thumb{width:32px;height:32px;border:none;border-radius:50%;background:var(--orange);cursor:pointer}
+
+  /* multi (cases) */
+  .multi{display:flex;flex-direction:column;gap:9px;max-width:560px;width:100%;margin:0 auto}
+  .multi .opt.selected{background:#fff7e9}
+  .free-text{margin-top:10px}
+
+  /* contact */
+  .contact-wrap{max-width:560px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+  .phone-row{display:flex;gap:12px}
+  .phone-prefix{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+     padding:0 22px;display:flex;align-items:center;font-size:22px;color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+  .privacy{background:rgba(244,169,31,.12);border-radius:12px;padding:14px 18px;color:#8a6a1a;font-size:15px}
+
+  /* bouton suivant (orange rond) */
+  .next-btn{position:absolute;right:40px;bottom:34px;width:64px;height:64px;border-radius:50%;
+     background:var(--orange);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+     box-shadow:0 6px 18px rgba(244,169,31,.4);transition:transform .15s,opacity .15s}
+  .next-btn:hover{transform:scale(1.05)}
+  .next-btn svg{width:26px;height:26px;fill:#fff}
+  .next-btn[disabled]{opacity:.4;cursor:not-allowed}
+  .cta-btn{background:var(--orange);color:#fff;border:none;border-radius:var(--radius);padding:22px;
+     font-size:22px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s}
+  .cta-btn:hover{transform:translateY(-2px)}
+
+  /* animation de transition (vers l'avant) */
+  .q-inner{width:100%;animation:slideIn .42s cubic-bezier(.22,.61,.36,1)}
+  .q-inner.out{animation:slideOut .32s ease forwards}
+  @keyframes slideIn{from{opacity:0;transform:translateX(40px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes slideOut{to{opacity:0;transform:translateX(-40px) scale(.98)}}
+
+  /* popup vidéo non finie */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:center;justify-content:center}
+  .overlay.show{display:flex}
+  .popup{background:var(--cream);border-radius:20px;padding:40px 44px;max-width:560px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .popup .warn{width:68px;height:68px;border-radius:50%;background:var(--orange);display:flex;align-items:center;
+     justify-content:center;margin:0 auto 16px;font-size:38px;color:#fff;font-weight:800}
+  .popup h3{color:var(--ink);font-size:26px;margin-bottom:12px}
+  .popup p{color:var(--inksoft);font-size:17px;line-height:1.4;margin-bottom:26px}
+  .popup .btns{display:flex;gap:14px;justify-content:center}
+  .popup button{border-radius:10px;padding:14px 34px;font-size:19px;font-weight:600;cursor:pointer;border:2px solid var(--orange)}
+  .popup .no{background:#fff;color:var(--ink)}
+  .popup .yes{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+  /* écran final préparation */
+  .prep{position:fixed;inset:0;background:var(--cream);z-index:60;display:none;flex-direction:column;
+     align-items:center;justify-content:center;gap:28px;text-align:center;padding:30px}
+  .prep.show{display:flex}
+  .prep h2{color:var(--ink);font-size:30px;max-width:520px}
+  .prep p{color:var(--inksoft);font-size:18px}
+  .spinner{width:64px;height:64px;border:6px solid #efe7da;border-top-color:var(--orange);border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ===== MOBILE : vidéo plein écran + overlay ===== */
+  @media(max-width:760px){
+    .stage{display:block}
+    .video-pane{position:fixed;inset:0;width:100%;height:100%}
+    .q-pane{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;
+       background:linear-gradient(to top,rgba(251,242,230,.97) 62%,rgba(251,242,230,.0));
+       padding:24px 22px calc(24px + env(safe-area-inset-bottom));justify-content:flex-end;max-height:62%}
+    .q-title{font-size:24px;color:var(--ink);text-shadow:0 1px 2px rgba(255,255,255,.4)}
+    .q-underline{margin-bottom:18px}
+    .opt{padding:16px 20px;font-size:17px}
+    .sex-wrap{gap:14px}.sex-card{width:auto;flex:1;height:130px}.sex-card .emoji{font-size:34px}.sex-card .lbl{font-size:18px}
+    .caption{bottom:auto;top:48%;font-size:14px}
+    .controls{height:40px}.controls .time{font-size:13px;min-width:64px}
+    .progress-pill{font-size:16px;padding:7px 16px}
+    .next-btn{right:22px;bottom:22px;width:60px;height:60px}
+    .img-grid{max-width:300px;gap:14px}.img-card img,.img-card svg{height:110px}
+    .field{padding:18px 20px;font-size:18px}
+  }
+  @media(prefers-reduced-motion:reduce){.q-inner,.q-inner.out{animation:none}}
+
+  /* ===== Écran de test (glisser ses vidéos) ===== */
+  .setup{position:fixed;inset:0;background:var(--cream);z-index:70;display:none;flex-direction:column;
+     padding:32px;overflow-y:auto}
+  .setup.show{display:flex}
+  .setup h1{color:var(--ink);font-size:26px;margin-bottom:6px;text-align:center}
+  .setup .sub{color:var(--inksoft);font-size:15px;text-align:center;margin-bottom:22px;max-width:620px;margin-left:auto;margin-right:auto}
+  .setup-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+     max-width:680px;width:100%;margin:0 auto;padding:22px}
+  .all-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff7e9;border-radius:12px;margin-bottom:18px;flex-wrap:wrap}
+  .all-row b{color:var(--ink);font-size:15px}
+  .step-row{display:flex;align-items:center;gap:14px;padding:12px 6px;border-bottom:1px solid var(--line)}
+  .step-row:last-child{border-bottom:none}
+  .step-row .name{flex:1;color:var(--ink);font-size:16px}
+  .step-row .fname{color:#2e9e6a;font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pick{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;
+     background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;
+     font-weight:600;cursor:pointer}
+  .pick input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .setup .launch{display:block;margin:24px auto 8px;background:var(--ink);color:#fff;border:none;border-radius:12px;
+     padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer}
+  .setup .skip{display:block;margin:0 auto;background:none;border:none;color:var(--inksoft);font-size:14px;
+     text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     CONFIG — édite ici tes vidéos, ton webhook et l'URL de fin
+     ============================================================ -->
+<script>
+const CONFIG = {
+  // Mets le chemin/URL de TA vidéo pour chaque étape (mp4). Laisse "" pour un placeholder.
+  // Tu peux mettre une vidéo différente selon le sexe : { femme:"...", homme:"..." }
+  videos: {
+    intro:     "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/INTRO%20PRENOM.mov",
+    prenom:    "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/INTRO%20PRENOM.mov",
+    age:       "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/age.mov",
+    taille:    "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/taille.mov",
+    poids:     "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/poids.mov",
+    niveau:    "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/niveau.mov",
+    sexe:      "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/sexe.mov",
+    objectif:  "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/objectif.mov",
+    physique:  "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/physique.mov",
+    lieu:      "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/maison%20ou%20domicile.mov",
+    seances:   "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/nbre%20de%20seance.mov",
+    blessure:  "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/SEGMENT%20BLESSURE.mov",
+    nourriture:"https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/SEGMENT%20NOURRITURE.mov",
+    sommeil:   "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/sommeil.mov",
+    contact:   "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/outro.mov"
+  },
+  // Fichiers de sous-titres .vtt par étape (optionnel). Laisse "" si la vidéo a déjà les sous-titres incrustés.
+  captions: {},
+  // Webhook Make pour envoyer les réponses + stats (quiz_visit, quiz_submission). À remplir avec l'URL du webhook.
+  webhookUrl: "https://hook.eu1.make.com/m7d6q0ecbwc9cy6hn2gixu8wep6e4nv9",
+  // URL de la page résultat personnalisée. À remplir avec l'URL où tu héberges resultat.html.
+  resultUrl: "https://quiz.club21.fr/merci.html",
+  // Images des corps (silhouettes) selon sexe + objectif
+  bodyImages: {
+    homme: {
+      curvy:  [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20CURVY%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20CURVY%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20CURVY%204.png"
+      ],
+      skinny: [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20SKINNY%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20SKINNY%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20SKINNY%203.png"
+      ],
+      mix: [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20MIX%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20MIX%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/HOMME%20MIX%203.png"
+      ]
+    },
+    femme: {
+      curvy:  [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20CURVY%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20CURVY%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20CURVY%204.png"
+      ],
+      skinny: [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20SKINNY%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20SKINNY%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20SKINNY%203.png"
+      ],
+      mix: [
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20MIX%201.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20MIX%202.png",
+        "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/FEMME%20MIX%203.png"
+      ]
+    }
+  },
+  warnIfVideoUnfinished: true,
+  // Mode test : affiche un écran pour glisser tes vidéos et voir l'aperçu. Mets false en production.
+  testMode: false
+};
+</script>
+
+<div class="stage">
+  <div class="video-pane" id="videoPane"></div>
+  <div class="q-pane" id="qPane"></div>
+</div>
+
+<!-- popup vidéo non finie -->
+<div class="overlay" id="overlay">
+  <div class="popup">
+    <div class="warn">!</div>
+    <h3>Attention</h3>
+    <p>Es-tu sûre de passer à la question suivante<br>sans avoir écouté toutes les instructions ?</p>
+    <div class="btns">
+      <button class="no" id="popNo">Non</button>
+      <button class="yes" id="popYes">Oui</button>
+    </div>
+  </div>
+</div>
+
+<!-- écran de préparation final -->
+<div class="prep" id="prep">
+  <div class="spinner"></div>
+  <h2 id="prepTitle">On prépare ton analyse personnalisée…</h2>
+  <p>Encore quelques secondes, on adapte tout à ton profil.</p>
+</div>
+
+<!-- écran de test : glisser ses vidéos -->
+<div class="setup" id="setup">
+  <h1>Aperçu — ajoute tes vidéos</h1>
+  <div class="sub">Choisis une vidéo (MP4) pour les étapes que tu veux tester, puis lance l'aperçu. Les étapes sans vidéo afficheront un placeholder. Rien n'est envoyé sur internet, tout reste sur ton ordinateur.</div>
+  <div class="setup-card">
+    <div class="all-row">
+      <b>Raccourci :</b>
+      <span style="color:var(--inksoft);font-size:14px">utiliser une même vidéo pour toutes les étapes</span>
+      <button class="pick">Choisir<input type="file" accept="video/*" id="allVid"></button>
+      <span class="fname" id="allName"></span>
+    </div>
+    <div id="stepList"></div>
+  </div>
+  <button class="launch" id="launchBtn">Lancer l'aperçu ▶</button>
+  <button class="skip" id="skipBtn">Lancer sans vidéo (juste le design)</button>
+</div>
+
+<script>
+function getBodyImages(sex, objective){
+  // Mappe l'objectif aux catégories d'images (INVERSÉ : curvy ↔ skinny)
+  let cat;
+  if(sex==='femme'){
+    if(objective.includes('Mincir')) cat = 'curvy';  // INVERSÉ
+    else if(objective.includes('galber') || objective.includes('tonifier')) cat = 'skinny';  // INVERSÉ
+    else cat = 'mix';
+  } else {
+    if(objective.includes('Sécher') || objective.includes('mincir')) cat = 'curvy';  // INVERSÉ
+    else if(objective.includes('muscle')) cat = 'skinny';  // INVERSÉ
+    else cat = 'mix';
+  }
+  // Retourne les 3 images directement
+  return CONFIG.bodyImages[sex] && CONFIG.bodyImages[sex][cat] ? CONFIG.bodyImages[sex][cat] : [];
+}
+
+function bodySVG(level, sex){
+  // level 0..3 (du plus fin au plus enveloppé), sex 'femme'|'homme'
+  const w = 30 + level*9;
+  const skin = "#d9b89a";
+  const bottom = sex==='femme' ? "#c98f7a" : "#2b2b2b";
+  const hair = sex==='femme' ? `<path d="M50 ${20} q-16 0 -16 18 q0 8 4 12 l24 0 q4 -4 4 -12 q0 -18 -16 -18z" fill="#6b4f3a"/>` : '';
+  return `data:image/svg+xml;utf8,`+encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'>`+
+    `<ellipse cx='50' cy='30' rx='13' ry='15' fill='${skin}'/>`+hair+
+    `<path d='M ${50-w} 120 Q 50 50 ${50+w} 120 Z' fill='${skin}'/>`+
+    `<rect x='${50-w*0.78}' y='116' width='${w*1.56}' height='24' rx='7' fill='${bottom}'/>`+
+    (sex==='femme'?`<rect x='${50-12}' y='52' width='24' height='10' rx='5' fill='#c98f7a'/>`:'')+
+    `</svg>`);
+}
+
+/* =========================================================
+   DÉFINITION DES ÉTAPES
+   (femme = cible Club 21 ; homme conservé pour le branchement)
+   ========================================================= */
+const STEPS = [
+  { id:'intro', type:'intro', title:'Pour démarrer, appuie sur lecture' },
+
+  { id:'prenom', type:'text', title:'Quel est ton prénom ?', placeholder:'Ton prénom…', required:true },
+
+  { id:'age', type:'choice', title:'Quel est ton âge ?',
+    options:['18 - 24 ans','25 - 34 ans','35 - 44 ans','45 - 54 ans','+ de 55 ans'] },
+
+  { id:'taille', type:'number', title:'Ta taille ?', placeholder:'En cm (ex: 168)', min:120, max:220, unit:'cm' },
+
+  { id:'poids', type:'number', title:'Ton poids ?', placeholder:'En kg (ex: 65)', min:30, max:200, unit:'kg' },
+
+  { id:'niveau', type:'choice', title:'Quel est ton niveau de pratique ?',
+    options:['Débutante','Intermédiaire','Confirmée'] },
+
+  { id:'sexe', type:'sex', title:'Tu es ?' },
+
+  { id:'objectif', type:'choice', title:'Quel est ton objectif ?',
+    optionsBySex:{
+      femme:['Mincir','Me galber / me tonifier','Mix complet'],
+      homme:['Sécher / mincir','Prendre du muscle','Mix complet']
+    } },
+
+  { id:'physique', type:'images', title:'De quel physique tu te rapproches le plus ?' },
+
+  { id:'lieu', type:'duo', title:"Tu souhaites t'entraîner en salle ou à domicile ?",
+    options:['En salle de sport','À domicile'] },
+
+  { id:'seances', type:'choice', title:'Combien de séances par semaine, actuellement ?',
+    options:['0 (je débute)','1 à 2','3 à 4','5 et +'] },
+
+  { id:'blessure', type:'multi', title:'As-tu une blessure ou une limitation à prendre en compte ?',
+    options:['Le dos','Les genoux','Les épaules','Post-grossesse','Aucune'],
+    freeText:true, freePlaceholder:'Précise si besoin (optionnel)…' },
+
+  { id:'nourriture', type:'choice', title:'Quelle est ta relation avec la nourriture ?',
+    options:['Je mange plutôt équilibré','Je grignote dès que je stresse','J\'ai des fringales le soir','Je mange mes émotions','C\'est compliqué'] },
+
+  { id:'sommeil', type:'slider', title:'Comment qualifies-tu ton sommeil ?',
+    left:'Mauvais / je dors mal', right:'Excellent / je dors très bien' },
+
+  { id:'contact', type:'contact', title:'Tes informations pour recevoir ton plan :' }
+];
+
+/* =========================================================
+   SUIVI (visites / soumissions) — envoyé vers ton webhook Make.com
+   qui alimente ton Data Store (comme pour la Session 1)
+   ========================================================= */
+function getOrCreateId(storage, key){
+  let v;
+  try{ v = storage.getItem(key); }catch(e){}
+  if(!v){
+    v = (crypto.randomUUID ? crypto.randomUUID() : 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2));
+    try{ storage.setItem(key, v); }catch(e){}
+  }
+  return v;
+}
+const visitorId = getOrCreateId(localStorage, 'club21_visitor_id');   // stable sur cet appareil/navigateur (= "répondant unique")
+const sessionId = getOrCreateId(sessionStorage, 'club21_session_id'); // un nouveau par visite/onglet
+
+function sendEvent(event, payload){
+  if(!CONFIG.webhookUrl) return;
+  // FLATTEN le payload pour que Make détecte tous les champs
+  const flatPayload = {};
+  if(payload){
+    Object.keys(payload).forEach(key => {
+      const val = payload[key];
+      if(Array.isArray(val)){
+        flatPayload[key] = val.join(', ');  // Array → string
+      } else if(typeof val === 'object' && val !== null){
+        flatPayload[key] = JSON.stringify(val);  // Object → JSON string
+      } else {
+        flatPayload[key] = val;
+      }
+    });
+  }
+  const body = Object.assign(
+    { event, visitorId, sessionId, ts: new Date().toISOString(), page: location.href, referrer: document.referrer||'' },
+    flatPayload
+  );
+  console.log('📤 WEBHOOK PAYLOAD:', JSON.stringify(body, null, 2));  // DEBUG
+  fetch(CONFIG.webhookUrl, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body), keepalive:true
+  }).catch(()=>{});
+}
+
+/* ========================================================= */
+const answers = {};
+let idx = 0;
+let videoUserUnlocked = false;   // après le 1er clic sur play, autoplay autorisé
+let pendingAdvance = null;       // pour la popup
+const qPane = document.getElementById('qPane');
+const videoPane = document.getElementById('videoPane');
+
+function sex(){ return answers.sexe || 'femme'; }
+function totalSteps(){ return STEPS.length - 1; } // hors intro
+function videoFor(step){
+  const v = CONFIG.videos[step.id];
+  if(!v) return "";
+  return (typeof v === 'object') ? (v[sex()]||v.femme||"") : v;
+}
+
+/* ---------- rendu vidéo ---------- */
+function renderVideo(step){
+  const src = videoFor(step);
+  const isIntro = step.type==='intro';
+  let html = `
+    ${isIntro?'':'<div class="progress-pill">'+stepNumber()+'/'+totalSteps()+'</div>'}
+    <div class="controls" id="controls" style="${isIntro?'display:none':''}">
+      <span class="time" id="vTime">0:00 / 0:00</span>
+      <button class="ctrl-btn" id="playBtn" aria-label="Lecture/Pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></button>
+      <button class="ctrl-btn" id="muteBtn" aria-label="Son"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/></svg></button>
+    </div>`;
+
+  if(src){
+    html += `<video id="vid" playsinline autoplay muted preload="auto">
+        <source src="${src}" type="video/mp4">
+      </video>`;
+  } else {
+    html += `<div class="video-placeholder">⟶ Ta vidéo de l'étape « ${step.id} » ici</div>`;
+  }
+  if(isIntro){
+    html += `<div class="big-play" id="bigPlay"><div class="circle"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div></div>`;
+  }
+  videoPane.innerHTML = html;
+  wireVideo(step, isIntro, !!src);
+}
+
+function stepNumber(){ return idx; } // intro=0, donc l'étape 1 = idx 1
+
+function wireVideo(step, isIntro, hasVideo){
+  const vid = document.getElementById('vid');
+  const bigPlay = document.getElementById('bigPlay');
+  const controls = document.getElementById('controls');
+  const fmt = s => { s=Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+
+  // câblage des boutons pause / son / temps — utilisé pour l'intro ET les questions
+  function wireControls(){
+    if(!vid || !controls) return;
+    const playBtn=document.getElementById('playBtn'),
+          muteBtn=document.getElementById('muteBtn'),
+          vTime=document.getElementById('vTime');
+    const playIcon = '<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+    const pauseIcon= '<svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg>';
+    const soundOn  = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/></svg>';
+    const soundOff = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+    const refreshPlay = ()=> playBtn.innerHTML = vid.paused ? pauseIcon : playIcon;
+    const refreshMute = ()=> muteBtn.innerHTML = vid.muted ? soundOff : soundOn;
+    vid.addEventListener('loadedmetadata', ()=> vTime.textContent = `${fmt(0)} / ${fmt(vid.duration)}`);
+    vid.addEventListener('timeupdate', ()=> vTime.textContent = `${fmt(vid.currentTime)} / ${fmt(vid.duration)}`);
+    vid.addEventListener('play', refreshPlay);
+    vid.addEventListener('pause', refreshPlay);
+    playBtn.onclick = ()=>{ if(vid.paused) vid.play(); else vid.pause(); };
+    muteBtn.onclick = ()=>{ vid.muted = !vid.muted; refreshMute(); };
+    refreshPlay(); refreshMute();
+  }
+
+  // INTRO : la vidéo tourne déjà en fond, muette (autoplay), avec le gros bouton play par-dessus.
+  // Ça donne déjà de l'animation à l'image. Un clic sur le bouton active juste le son et continue de là où elle en est.
+  if(bigPlay){
+    if(vid){ vid.play().catch(()=>{}); }
+    bigPlay.addEventListener('click', ()=>{
+      videoUserUnlocked = true;
+      bigPlay.style.display = 'none';
+      if(vid){
+        if(controls) controls.style.display = 'flex';
+        wireControls();
+        vid.muted = false;
+        if(vid.paused) vid.play().catch(()=>{});
+      }
+      // Avancer immédiatement à la première question (pas besoin d'attendre la vidéo)
+      setTimeout(()=> next(), 300);
+    });
+    return;
+  }
+
+  // QUESTIONS : autoplay (avec son si déjà débloqué) + contrôles
+  if(!hasVideo) return;
+  vid.muted = !videoUserUnlocked;
+  vid.currentTime = 0;
+  vid.play().then(()=>{ if(videoUserUnlocked) vid.muted=false; }).catch(()=>{});
+  wireControls();
+}
+
+function videoEnded(){
+  const vid = document.getElementById('vid');
+  if(!vid) return true;          // pas de vidéo => on n'embête pas
+  return vid.ended || vid.currentTime >= (vid.duration-0.3);
+}
+
+/* ---------- rendu question ---------- */
+// colle la ponctuation au mot précédent pour éviter qu'un « ? » se retrouve seul sur une ligne
+function nbsp(s){ return s.replace(/ ([?!:;»])/g,'\u00a0$1').replace(/(«) /g,'$1\u00a0'); }
+function renderQuestion(step){
+  const single = ['text','number','slider','contact'].includes(step.type);
+  qPane.style.justifyContent = single ? 'center' : 'center';
+  let inner = `<div class="q-inner" id="qInner">
+      <div class="q-title">${nbsp(step.title)}</div><div class="q-underline"></div>`;
+
+  if(step.type==='choice' || step.type==='duo'){
+    const opts = step.optionsBySex ? step.optionsBySex[sex()] : step.options;
+    const cls = step.type==='duo' ? 'duo' : 'options';
+    inner += `<div class="${cls}">`;
+    if(step.type==='duo'){
+      inner += `<div class="opt" data-val="${opts[0]}"><span class="opt-fill"></span><span class="opt-label">${opts[0]}</span></div><div class="sep">ou</div><div class="opt" data-val="${opts[1]}"><span class="opt-fill"></span><span class="opt-label">${opts[1]}</span></div>`;
+    } else {
+      opts.forEach(o=> inner += `<div class="opt" data-val="${o}"><span class="opt-fill"></span><span class="opt-label">${o}</span></div>`);
+    }
+    inner += `</div>`;
+  }
+  else if(step.type==='sex'){
+    inner += `<div class="sex-wrap">
+      <div class="sex-card" data-val="homme"><span class="opt-fill"></span><div class="emoji">♂️</div><div class="lbl">Un homme</div></div>
+      <div class="sex-card" data-val="femme"><span class="opt-fill"></span><div class="emoji">♀️</div><div class="lbl">Une femme</div></div>
+    </div>`;
+  }
+  else if(step.type==='text' || step.type==='number'){
+    const t = step.type==='number'?'number':'text';
+    inner += `<div class="field-wrap">
+      <input class="field" id="inp" type="${t}" placeholder="${step.placeholder||''}" ${step.type==='number'?`min="${step.min}" max="${step.max}"`:''}>
+      <div class="field-hint" id="hint"></div></div>
+      <button class="next-btn" id="nextBtn"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  }
+  else if(step.type==='images'){
+    const sex = answers.sexe || 'femme';
+    const objective = answers.objectif || '';
+    const imgs = getBodyImages(sex, objective);
+    
+    inner += `<div class="img-grid img-grid-3">`;
+    for(let i=0;i<3;i++){
+      const src = imgs[i] || '';
+      inner += `<div class="img-card" data-val="physique_${i}"><img src="${src}" alt=""></div>`;
+    }
+    inner += `</div>`;
+  }
+  else if(step.type==='slider'){
+    inner += `<div class="slider-wrap">
+      <div class="slider-labels"><span>${step.left}</span><span>${step.right}</span></div>
+      <input type="range" id="rng" min="0" max="100" value="50">
+      </div>
+      <button class="next-btn" id="nextBtn"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  }
+  else if(step.type==='multi'){
+    inner += `<div class="multi" id="multi">`;
+    // Filtrer "Post-grossesse" si c'est un homme
+    const sex = answers.sexe || 'femme';
+    const filteredOptions = step.options.filter(o => !(o === 'Post-grossesse' && sex === 'homme'));
+    filteredOptions.forEach(o=> inner += `<div class="opt" data-val="${o}"><span class="opt-fill"></span><span class="opt-label">${o}</span></div>`);
+    inner += `</div>`;
+    if(step.freeText) inner += `<div class="field-wrap free-text"><input class="field" id="freeInp" placeholder="${step.freePlaceholder||''}"></div>`;
+    inner += `<button class="next-btn" id="nextBtn"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  }
+  else if(step.type==='contact'){
+    inner += `<div class="contact-wrap">
+      <input class="field" id="email" type="email" placeholder="Ton e-mail">
+      <div class="phone-row"><div class="phone-prefix">+33</div>
+        <input class="field" id="phone" type="tel" placeholder="6 95 95 59 32" style="flex:1"></div>
+      <div class="privacy">🔒 Tes données servent uniquement à te transmettre tes résultats. Aucune utilisation commerciale.</div>
+      <button class="cta-btn" id="submitBtn">Recevoir mon plan</button>
+    </div>`;
+  }
+  inner += `</div>`;
+  qPane.innerHTML = inner;
+  wireQuestion(step);
+}
+
+function wireQuestion(step){
+  const tryAdvance = (saveFn)=>{
+    // Le warning s'affiche qu'UNE FOIS (première fois qu'on valide avant la fin d'une vidéo)
+    // À partir de la première vidéo (prénom), pas juste à partir de la 2e
+    if(CONFIG.warnIfVideoUnfinished && !videoEnded() && !window.videoWarningShown){
+      window.videoWarningShown = true;  // marquer que le warning a été montré
+      pendingAdvance = saveFn;
+      document.getElementById('overlay').classList.add('show');
+    } else { saveFn(); }
+  };
+
+  if(step.type==='choice' || step.type==='duo'){
+    qPane.querySelectorAll('.opt').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(el.classList.contains('selected')) return; // évite le double-clic pendant l'animation
+        el.classList.add('selected');
+        setTimeout(()=> tryAdvance(()=>{ answers[step.id]=el.dataset.val; next(); }), 380);
+      });
+    });
+  }
+  else if(step.type==='sex'){
+    qPane.querySelectorAll('.sex-card').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(el.classList.contains('selected')) return;
+        el.classList.add('selected');
+        setTimeout(()=> tryAdvance(()=>{ answers.sexe=el.dataset.val; next(); }), 380);
+      });
+    });
+  }
+  else if(step.type==='images'){
+    qPane.querySelectorAll('.img-card').forEach(el=>{
+      el.addEventListener('click', ()=> tryAdvance(()=>{ answers[step.id]=el.dataset.val; next(); }));
+    });
+  }
+  else if(step.type==='text' || step.type==='number'){
+    const inp=document.getElementById('inp'), hint=document.getElementById('hint'), btn=document.getElementById('nextBtn');
+    setTimeout(()=>inp.focus(),300);
+    const submit=()=>{
+      const v=inp.value.trim();
+      if(step.required && !v){ hint.textContent='Ce champ est requis.'; hint.classList.add('err'); return; }
+      if(step.type==='number'){
+        const n=parseInt(v,10);
+        if(isNaN(n)||n<step.min||n>step.max){ hint.textContent=`Indique une valeur entre ${step.min} et ${step.max}.`; hint.classList.add('err'); return; }
+      }
+      tryAdvance(()=>{ answers[step.id]=v; next(); });
+    };
+    btn.addEventListener('click',submit);
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+    if(step.type==='number'){ hint.textContent=`Entre ${step.min} et ${step.max}.`; }
+  }
+  else if(step.type==='slider'){
+    const rng=document.getElementById('rng'), btn=document.getElementById('nextBtn');
+    const paint=()=>{ const p=rng.value; rng.style.background=`linear-gradient(to right,var(--orange) 0%,var(--orange) ${p}%,#efe7da ${p}%,#efe7da 100%)`; };
+    rng.addEventListener('input',paint); paint();
+    btn.addEventListener('click',()=> tryAdvance(()=>{ answers[step.id]=rng.value; next(); }));
+  }
+  else if(step.type==='multi'){
+    const btn=document.getElementById('nextBtn');
+    let autoAdvanceTimeout;
+    qPane.querySelectorAll('#multi .opt').forEach(el=>{
+      el.addEventListener('click',()=>{
+        clearTimeout(autoAdvanceTimeout);  // reset timer si nouvel clic
+        if(el.dataset.val.toLowerCase().includes('aucune')){
+          qPane.querySelectorAll('#multi .opt').forEach(o=>o.classList.remove('selected'));
+          el.classList.add('selected');
+        } else {
+          qPane.querySelector('#multi .opt[data-val="Aucune"]')?.classList.remove('selected');
+          el.classList.toggle('selected');
+        }
+        // Auto-advance après 600ms (temps pour voir la sélection)
+        autoAdvanceTimeout = setTimeout(()=> btn.click(), 600);
+      });
+    });
+    btn.addEventListener('click',()=> tryAdvance(()=>{
+      const sel=[...qPane.querySelectorAll('#multi .opt.selected')].map(e=>e.dataset.val);
+      answers[step.id]=sel;
+      const f=document.getElementById('freeInp'); if(f&&f.value.trim()) answers[step.id+'_precision']=f.value.trim();
+      next();
+    }));
+  }
+  else if(step.type==='contact'){
+    document.getElementById('submitBtn').addEventListener('click',()=>{
+      const email=document.getElementById('email').value.trim();
+      const phone=document.getElementById('phone').value.trim();
+      if(!/.+@.+\..+/.test(email)){ alert('Indique un e-mail valide.'); return; }
+      if(phone.length<6){ alert('Indique un numéro valide.'); return; }
+      answers.email=email; answers.telephone='+33'+phone.replace(/^0/,'');
+      finish();
+    });
+  }
+}
+
+/* ---------- popup handlers ---------- */
+document.getElementById('popNo').addEventListener('click',()=>{ document.getElementById('overlay').classList.remove('show'); pendingAdvance=null; });
+document.getElementById('popYes').addEventListener('click',()=>{ document.getElementById('overlay').classList.remove('show'); const f=pendingAdvance; pendingAdvance=null; if(f)f(); });
+
+/* ---------- navigation (pas de retour arrière) ---------- */
+function render(){
+  const step = STEPS[idx];
+  renderVideo(step);
+  if(step.type!=='intro') renderQuestion(step);
+  else qPane.innerHTML = `<div class="q-inner"><div class="q-title">${nbsp(step.title)}</div><div class="q-underline"></div></div>`;
+}
+function next(){
+  const inner=document.getElementById('qInner');
+  const go=()=>{ idx++; if(idx>=STEPS.length){ finish(); return;} render(); };
+  if(inner){ inner.classList.add('out'); setTimeout(go,300); } else go();
+}
+
+/* ---------- Appeler la Function pour générer l'URL vidéo ---------- */
+async function callGenerateVideo(answers) {
+  try {
+    const response = await fetch('/.netlify/functions/generate-video-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok && data.videoUrl) {
+      console.log('✅ URL vidéo générée:', data.videoUrl);
+      return data.videoUrl;
+    } else {
+      console.error('❌ Erreur génération URL:', data);
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ Erreur appel Function:', error);
+    return null;
+  }
+}
+
+/* ---------- fin ---------- */
+async function finish(){
+  document.getElementById('prep').classList.add('show');
+  
+  // Générer l'URL vidéo perso
+  const videoUrl = await callGenerateVideo(answers);
+  if (videoUrl) {
+    answers.videoUrl = videoUrl;
+    console.log('📹 URL vidéo ajoutée aux réponses');
+  }
+  
+  // Envoyer les réponses + URL vidéo à Make
+  sendEvent('quiz_submission', answers);
+  console.log('RÉPONSES CLUB 21 :', answers);
+  
+  // redirection éventuelle vers la page d'analyse / réservation
+  if(CONFIG.resultUrl){
+    setTimeout(()=>{ location.href = CONFIG.resultUrl + (CONFIG.resultUrl.includes('?')?'&':'?') + 'data='+encodeURIComponent(JSON.stringify(answers)); }, 2500);
+  } else {
+    setTimeout(()=>{ document.getElementById('prepTitle').textContent = (answers.prenom?answers.prenom+', ':'')+'ton analyse est prête ✨'; document.querySelector('.spinner').style.display='none'; }, 2500);
+  }
+}
+
+/* ---------- écran de test : assigner ses vidéos ---------- */
+function buildSetup(){
+  const list = document.getElementById('stepList');
+  STEPS.forEach(s=>{
+    const label = s.type==='intro' ? "Vidéo d'intro (écran « appuie sur lecture »)" : s.title;
+    const row=document.createElement('div'); row.className='step-row';
+    row.innerHTML=`<span class="name">${label}</span>
+      <span class="fname" id="fn_${s.id}"></span>
+      <button class="pick">Choisir<input type="file" accept="video/*" data-step="${s.id}"></button>`;
+    list.appendChild(row);
+  });
+  // pickers par étape
+  list.querySelectorAll('input[type=file]').forEach(inp=>{
+    inp.addEventListener('change',e=>{
+      const f=e.target.files[0]; if(!f) return;
+      CONFIG.videos[inp.dataset.step]=URL.createObjectURL(f);
+      document.getElementById('fn_'+inp.dataset.step).textContent='✓ '+f.name;
+    });
+  });
+  // une vidéo pour toutes
+  document.getElementById('allVid').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const url=URL.createObjectURL(f);
+    STEPS.forEach(s=>{ CONFIG.videos[s.id]=url; const el=document.getElementById('fn_'+s.id); if(el) el.textContent='✓ '+f.name; });
+    document.getElementById('allName').textContent='✓ '+f.name;
+  });
+  document.getElementById('launchBtn').addEventListener('click',startQuiz);
+  document.getElementById('skipBtn').addEventListener('click',startQuiz);
+}
+function startQuiz(){
+  document.getElementById('setup').classList.remove('show');
+  render();
+}
+
+/* ---------- démarrage ---------- */
+if(CONFIG.testMode){
+  document.getElementById('setup').classList.add('show');
+  buildSetup();
+} else {
+  sendEvent('quiz_visit');   // 1 ping par ouverture réelle de la page (hors mode test)
+  render();
+}</script>
+</body>
+</html>
