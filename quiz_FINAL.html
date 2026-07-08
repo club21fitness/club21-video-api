@@ -320,7 +320,7 @@ const CONFIG = {
 <!-- écran de préparation final -->
 <div class="prep" id="prep">
   <div class="spinner"></div>
-  <h2 id="prepTitle">On prépare ton analyse personnalisée…</h2>
+  <h2 id="prepTitle">Nous analysons en ce moment même tes réponses…<br><span style="font-size:16px;font-weight:400;margin-top:10px;display:block;">Ton plan vidéo est <strong>100% GRATUIT</strong> 🎁</span></h2>
   <p>Encore quelques secondes, on adapte tout à ton profil.</p>
 </div>
 
@@ -791,12 +791,17 @@ async function finish(){
   // Envoyer les réponses + URL vidéo à Make
   sendEvent('quiz_submission', answers);
   console.log('RÉPONSES CLUB 21 :', answers);
+  console.log('☁️ Toutes les données (dont videoUrl) sont envoyées à Make — source de vérité 100% cloud');
   
   // redirection éventuelle vers la page d'analyse / réservation
   if(CONFIG.resultUrl){
     setTimeout(()=>{ location.href = CONFIG.resultUrl + (CONFIG.resultUrl.includes('?')?'&':'?') + 'data='+encodeURIComponent(JSON.stringify(answers)); }, 2500);
   } else {
-    setTimeout(()=>{ document.getElementById('prepTitle').textContent = (answers.prenom?answers.prenom+', ':'')+'ton analyse est prête ✨'; document.querySelector('.spinner').style.display='none'; }, 2500);
+    setTimeout(()=>{ 
+      const msg = (answers.prenom?answers.prenom+', ':'')+'ton plan vidéo est prêt ✨<br><span style="font-size:16px;font-weight:400;">C\'est 100% GRATUIT 🎁</span>'; 
+      document.getElementById('prepTitle').innerHTML = msg; 
+      document.querySelector('.spinner').style.display='none'; 
+    }, 2500);
   }
 }
 
