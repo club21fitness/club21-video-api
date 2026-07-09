@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ton Plan Personnalisé - Club21</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: white;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0;
+            background: white;
+            border-radius: 0;
+            padding: 40px;
+            box-shadow: none;
+        }
+        
+        /* === CURSEUR ANIMÉ (SOURIS) === */
+        .cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+        }
+        
+        .cursor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .cursor.active {
+            opacity: 1;
+            animation: moveMouse 60s ease-in-out forwards;
+        }
+        
+        @keyframes moveMouse {
+            0% { left: 50px; top: 100px; }
+            5% { left: 80px; top: 120px; }
+            10% { left: 120px; top: 140px; }
+            15% { left: 100px; top: 180px; }
+            20% { left: 140px; top: 160px; }
+            25% { left: 250px; top: 280px; }
+            30% { left: 280px; top: 300px; }
+            35% { left: 350px; top: 320px; }
+            40% { left: 380px; top: 350px; }
+            45% { left: 300px; top: 400px; }
+            50% { left: 250px; top: 450px; }
+            55% { left: 350px; top: 480px; }
+            60% { left: 280px; top: 520px; }
+            65% { left: 200px; top: 580px; }
+            70% { left: 320px; top: 620px; }
+            75% { left: 250px; top: 650px; }
+            80% { left: 300px; top: 700px; }
+            85% { left: 180px; top: 720px; }
+            90% { left: 220px; top: 750px; }
+            95% { left: 150px; top: 780px; }
+            100% { left: 50px; top: 100px; }
+        }
+        
+        /* === SECTION TOP === */
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 50px;
+            gap: 40px;
+            position: relative;
+        }
+        
+        .profile-left {
+            flex: 1;
+            padding-right: 180px;
+        }
+        
+        .logo {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo span {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .profile-info {
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+        
+        .profile-info div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-label {
+            font-weight: 400;
+            color: #333;
+            min-width: 100px;
+            font-size: 0.9em;
+        }
+        
+        .profile-value {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* PETITE BULLE VIDÉO */
+        .video-bubble {
+            flex: 0 0 180px;
+            text-align: center;
+            position: absolute;
+            top: 40px;
+            right: 20px;
+        }
+        
+        .video-player-small {
+            width: 180px;
+            height: 180px;
+            background: black;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .video-player-small video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* === SECTION MILIEU - IMAGES AVANT/APRÈS === */
+        .body-transformation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .body-image-box {
+            text-align: center;
+        }
+        
+        .body-image {
+            width: 200px;
+            height: 300px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .body-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .arrow-divider {
+            font-size: 3em;
+            color: #333;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* === SECTION BAS - DONNÉES === */
+        .data-section {
+            margin-bottom: 50px;
+        }
+        
+        .data-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-items {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .data-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.05em;
+            min-width: 200px;
+        }
+        
+        .data-content {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .data-value {
+            font-weight: 600;
+            color: #333;
+            text-align: right;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #e8f5e9 100%);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .data-answer {
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        /* === CTA SECTION === */
+        .cta-section {
+            background: #000;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .cta-section.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .cta-section h2 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+        }
+        
+        .cta-section p {
+            color: white;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #e74c3c;
+            cursor: pointer;
+            font-size: 1em;
+            min-width: 220px;
+            background: white;
+            color: #000;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+            background: #f5f5f5;
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                margin: 0;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            .profile-left {
+                padding-right: 160px;
+            }
+            
+            .top-section {
+                flex-direction: column;
+                margin-bottom: 30px;
+                gap: 20px;
+            }
+            
+            .video-bubble {
+                position: absolute;
+                top: 20px;
+                right: 10px;
+                width: auto;
+            }
+            
+            .video-player-small {
+                width: 140px;
+                height: 140px;
+                margin: 0;
+            }
+            
+            /* MOBILE: Images restent horizontales */
+            .body-transformation {
+                flex-direction: row;
+                gap: 15px;
+                justify-content: center;
+            }
+            
+            .body-image-box {
+                width: auto;
+            }
+            
+            .body-image {
+                width: 140px;
+                height: 210px;
+                margin: 0;
+            }
+            
+            .arrow-divider {
+                font-size: 1.8em;
+            }
+            
+            .data-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .data-label {
+                min-width: auto;
+                margin-bottom: 10px;
+                font-size: 0.9em;
+            }
+            
+            .data-content {
+                width: 100%;
+                max-width: none;
+            }
+            
+            .data-value {
+                text-align: left;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .cta-button {
+                min-width: 100%;
+            }
+        }
+        
+        /* DESKTOP: Images en horizontal */
+        @media (min-width: 1025px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .body-transformation {
+                flex-direction: row;
+                gap: 40px;
+            }
+            
+            .body-image {
+                width: 200px;
+                height: 300px;
+            }
+            
+            .arrow-divider {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CURSEUR ANIMÉ (SOURIS) -->
+    <div class="cursor" id="cursor">
+        <img src="cursor.png" alt="cursor" width="32" height="32" style="width: 32px; height: 32px;">
+    </div>
+    
+    <div class="container">
+        <!-- TOP: PROFIL + VIDEO BULLE -->
+        <div class="top-section">
+            <div class="profile-left">
+                <div class="logo">
+                    <span>🎯</span>
+                    <span id="prenomDisplay">Guillaume</span>
+                </div>
+                <div class="profile-info">
+                    <div>
+                        <span class="profile-label">ÂGE :</span>
+                        <span class="profile-value" id="ageDisplay">25 - 34 ANS</span>
+                    </div>
+                    <div>
+                        <span class="profile-label">TAILLE :</span>
+                        <span class="profile-value" id="tailleDisplay">180 CM</span>
+                    </div>
+                    <div>
+                        <span class="profile-label">POIDS :</span>
+                        <span class="profile-value" id="poidsDisplay">90 KG</span>
+                    </div>
+                    <div>
+                        <span class="profile-label">OBJECTIF :</span>
+                        <span class="profile-value" id="objectifDisplay">MIX COMPLET</span>
+                    </div>
+                    <div>
+                        <span class="profile-label">NIVEAU :</span>
+                        <span class="profile-value" id="niveauDisplay">INTERMÉDIAIRE</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PETITE BULLE VIDÉO EN HAUT À DROITE -->
+            <div class="video-bubble">
+                <div class="video-player-small">
+                    <video id="videoPlayer" controls></video>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MILIEU: 2 IMAGES AVANT/APRÈS -->
+        <div class="body-transformation">
+            <div class="body-image-box">
+                <div class="body-image">
+                    <img id="beforeImage" src="" alt="Avant">
+                </div>
+            </div>
+            
+            <div class="arrow-divider">→</div>
+            
+            <div class="body-image-box">
+                <div class="body-image">
+                    <img id="afterImage" src="" alt="Après">
+                </div>
+            </div>
+        </div>
+        
+        <!-- BAS: TES DONNÉES PERSONNELLES -->
+        <div class="data-section">
+            <div class="data-title">TES DONNÉES PERSONNELLES</div>
+            <div class="data-items">
+                <div class="data-item">
+                    <div class="data-label">NIVEAU DE SOMMEIL</div>
+                    <div class="data-content">
+                        <div class="data-value" id="sommeilScore">50%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="sommeilBar"></div>
+                        </div>
+                        <div class="data-answer" id="sommeilAnswer">Moyen</div>
+                    </div>
+                </div>
+                
+                <div class="data-item">
+                    <div class="data-label">NOURRITURE</div>
+                    <div class="data-content">
+                        <div class="data-answer" id="nourritureAnswer">Je mange plutôt équilibré</div>
+                    </div>
+                </div>
+                
+                <div class="data-item">
+                    <div class="data-label">BLESSURE</div>
+                    <div class="data-content">
+                        <div class="data-answer" id="blessureAnswer">Aucune</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA (caché au départ) -->
+        <div class="cta-section" id="ctaSection">
+            <h2>Prêt à commencer ta transformation ?</h2>
+            <p>Tu as maintenant un plan clair et personnalisé. Choisis l'option qui te correspond :</p>
+            <div class="cta-buttons">
+                <a href="#club21" class="cta-button">
+                    👥 Rejoindre Club21 (~21€/mois)
+                </a>
+                <a href="#appel" class="cta-button">
+                    📞 Réserver un Appel Gratuit<br>
+                    <small style="font-size: 0.75em; opacity: 0.9;">Suivi Personnalisé avec un Coach</small>
+                </a>
+            </div>
+            <p style="margin-top: 25px; font-size: 0.9em; opacity: 0.7;">
+                ✅ Garantie "Transformé ou remboursé" sur tous nos plans
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        const baseUrl = "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/club21-profile-videos/segments";
+        
+        function getQuizAnswers() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                prenom: urlParams.get('prenom') || localStorage.getItem('quiz_prenom') || 'Guillaume',
+                sexe: urlParams.get('sexe') || localStorage.getItem('quiz_sexe') || 'homme',
+                age: urlParams.get('age') || localStorage.getItem('quiz_age') || '25 - 34 ans',
+                niveau: urlParams.get('niveau') || localStorage.getItem('quiz_niveau') || 'Intermédiaire',
+                physique: urlParams.get('physique') || localStorage.getItem('quiz_physique') || 'Composition à ajuster',
+                objectif: urlParams.get('objectif') || localStorage.getItem('quiz_objectif') || 'Mix',
+                lieu: urlParams.get('lieu') || localStorage.getItem('quiz_lieu') || 'En salle',
+                seances: urlParams.get('seances') || localStorage.getItem('quiz_seances') || '4',
+                sommeil: urlParams.get('sommeil') || localStorage.getItem('quiz_sommeil') || '50',
+                nourriture: urlParams.get('nourriture') || localStorage.getItem('quiz_nourriture') || 'Je mange plutôt équilibré',
+                blessure: JSON.parse(urlParams.get('blessure') || localStorage.getItem('quiz_blessure') || '["Aucune"]'),
+                poids: parseInt(urlParams.get('poids') || localStorage.getItem('quiz_poids') || '90'),
+                taille: parseInt(urlParams.get('taille') || localStorage.getItem('quiz_taille') || '180')
+            };
+        }
+        
+        // Construit l'URL Cloudinary unique (11 segments collés, zéro latence)
+        function buildCloudinaryVideoUrl(answers) {
+            const ageMap = {
+                '18 - 24 ans': '18_24', '25 - 34 ans': '25_34',
+                '35 - 44 ans': '35_44', '45 - 54 ans': '45_plus', '+ de 55 ans': '45_plus'
+            };
+            const niveauMap = {
+                'Débutante': 'debutant', 'Intermédiaire': 'intermediaire', 'Confirmée': 'avance'
+            };
+            const objectifMapFemme = {
+                'Mincir': 'mincir_f', 'Me galber / me tonifier': 'galber_f', 'Mix complet': 'tonifier_f'
+            };
+            const objectifMapHomme = {
+                'Sécher / mincir': 'perdre_poids_h', 'Prendre du muscle': 'muscle_h', 'Mix complet': 'recomposition_h'
+            };
+            const lieuMap = { 'En salle de sport': 'salle', 'salle': 'salle', 'À domicile': 'maison', 'maison': 'maison' };
+            const seancesMap = { '0 (je débute)': '3', '1 à 2': '3', '3 à 4': '4', '5 et +': '6' };
+            const nourritureMap = {
+                'Je mange plutôt équilibré': 'equilibre',
+                'Je grignote dès que je stresse': 'stress',
+                "J'ai des fringales le soir": 'fringales_soir',
+                'Je mange mes émotions': 'emotions',
+                "C'est compliqué": 'complique'
+            };
+
+            const sexe = answers.sexe === 'homme' ? 'homme' : 'femme';
+            const age = ageMap[answers.age] || '25_34';
+            const niveau = niveauMap[answers.niveau] || 'intermediaire';
+
+            let objectif;
+            if (sexe === 'femme') objectif = objectifMapFemme[answers.objectif] || 'tonifier_f';
+            else objectif = objectifMapHomme[answers.objectif] || 'recomposition_h';
+
+            // Physique : catégorie déduite du sexe + objectif (curvy/skinny/mix), pas de l'index brut
+            let physique;
+            if (sexe === 'femme') {
+                if (answers.objectif && answers.objectif.includes('Mincir')) physique = 'composition_f';
+                else if (answers.objectif && (answers.objectif.includes('galber') || answers.objectif.includes('tonifier'))) physique = 'mince_f';
+                else physique = 'equilibre';
+            } else {
+                if (answers.objectif && (answers.objectif.includes('Sécher') || answers.objectif.includes('mincir'))) physique = 'composition_h';
+                else if (answers.objectif && answers.objectif.includes('muscle')) physique = 'mince_h';
+                else physique = 'equilibre';
+            }
+
+            const lieu = lieuMap[answers.lieu] || 'salle';
+            const seances = seancesMap[answers.seances] || '4';
+            const entrainement = `${lieu}_${sexe.charAt(0)}_${seances}`;
+
+            const nourriture = nourritureMap[answers.nourriture] || 'equilibre';
+
+            let sommeil = 'moyen';
+            const sommeilVal = parseInt(answers.sommeil, 10) || 50;
+            if (sommeilVal <= 33) sommeil = 'tres_mal';
+            else if (sommeilVal >= 67) sommeil = 'tres_bien';
+
+            let blessure = 'aucune';
+            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') {
+                blessure = 'generique';
+            }
+
+            const segments = [
+                `segments:age:${age}`,
+                `segments:sexe:${sexe}`,
+                `segments:niveau:${niveau}`,
+                `segments:objectif:${objectif}`,
+                `segments:physique:${physique}`,
+                `segments:entrainement:${entrainement}`,
+                `segments:nourriture:${nourriture}`,
+                `segments:sommeil:${sommeil}`,
+                `segments:blessure:${blessure}`
+            ];
+
+            let transformations = 'w_1080,h_1920,c_pad,b_black';
+            for (const seg of segments) {
+                transformations += `/fl_splice,l_video:${seg},w_1080,h_1920,c_pad,b_black/fl_layer_apply`;
+            }
+
+            return `https://res.cloudinary.com/muai6pwk/video/upload/${transformations}/v1/segments/intro.mp4`;
+        }
+        
+        // Plus besoin de classe de concaténation manuelle : Cloudinary livre
+        // déjà UNE seule vidéo (intro → outro), donc on charge juste l'URL.
+        function playVideo(videoElement, url) {
+            videoElement.src = url;
+            videoElement.load();
+            videoElement.play().catch(() => {});
+        }
+        
+        // === ANIMATION CURSEUR ===
+        function startCursorAnimation() {
+            const cursor = document.getElementById('cursor');
+            cursor.classList.add('active');
+        }
+        
+        function renderData(answers) {
+            document.getElementById('prenomDisplay').textContent = answers.prenom;
+            document.getElementById('ageDisplay').textContent = answers.age.toUpperCase();
+            document.getElementById('tailleDisplay').textContent = answers.taille + ' CM';
+            document.getElementById('poidsDisplay').textContent = answers.poids + ' KG';
+            document.getElementById('objectifDisplay').textContent = answers.objectif.toUpperCase();
+            document.getElementById('niveauDisplay').textContent = answers.niveau.toUpperCase();
+            
+            document.getElementById('beforeImage').src = `https://via.placeholder.com/200x300/ccc/999?text=Avant`;
+            document.getElementById('afterImage').src = `https://via.placeholder.com/200x300/ccc/999?text=Après`;
+            
+            // SOMMEIL
+            const sommeilVal = parseInt(answers.sommeil) || 50;
+            document.getElementById('sommeilScore').textContent = sommeilVal + '%';
+            document.getElementById('sommeilBar').style.width = sommeilVal + '%';
+            
+            let sommeilLabel = 'Moyen';
+            if (sommeilVal <= 30) sommeilLabel = 'Très mal';
+            else if (sommeilVal >= 70) sommeilLabel = 'Très bien';
+            document.getElementById('sommeilAnswer').textContent = sommeilLabel;
+            
+            // NOURRITURE
+            document.getElementById('nourritureAnswer').textContent = answers.nourriture;
+            
+            // BLESSURE
+            let blessureText = 'Aucune';
+            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') {
+                blessureText = answers.blessure.join(', ');
+            }
+            document.getElementById('blessureAnswer').textContent = blessureText;
+        }
+        
+        function init() {
+            const answers = getQuizAnswers();
+            // L'URL vidéo arrive directement dans le lien envoyé par Make (paramètre ?videoUrl=...).
+            // Si absente (lien incomplet), on la reconstruit ici à partir des réponses en secours.
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoUrl = urlParams.get('videoUrl') || buildCloudinaryVideoUrl(answers);
+            
+            renderData(answers);
+            
+            playVideo(document.getElementById('videoPlayer'), videoUrl);
+            
+            // Animer la souris au démarrage
+            startCursorAnimation();
+            
+            // CTA après 1 min
+            setTimeout(() => {
+                document.getElementById('ctaSection').classList.add('visible');
+            }, 60000);
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
