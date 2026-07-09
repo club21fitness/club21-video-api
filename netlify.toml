@@ -11,3 +11,4 @@ status = 200
 from = "/"
 to = "/quiz_FINAL.html"
 status = 200
+force = true
