@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Merci - Club21</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(160deg, #FBF8F3 0%, #FDF3E0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            text-align: center;
+            color: #333;
+            animation: fadeIn 0.8s ease-in;
+            background: #fff;
+            padding: 48px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(244, 169, 31, 0.12);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-size: 2.2em;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #F4A91F;
+        }
+        
+        .logo span {
+            font-weight: bold;
+        }
+        
+        .free-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #F4A91F, #E69A12);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95em;
+            padding: 10px 22px;
+            border-radius: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 20px rgba(244, 169, 31, 0.35);
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #333;
+        }
+        
+        .subtitle {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 36px;
+            line-height: 1.6;
+            font-weight: 700;
+        }
+        
+        .message {
+            background: rgba(244, 169, 31, 0.08);
+            border: 2px solid rgba(244, 169, 31, 0.35);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 36px;
+            color: #333;
+            line-height: 1.7;
+            font-size: 1.02em;
+            text-align: left;
+        }
+        
+        .message strong {
+            color: #E69A12;
+            font-weight: 700;
+        }
+        
+        .loading {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #F4A91F;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        .status {
+            margin-top: 24px;
+            font-size: 0.92em;
+            color: #999;
+            font-weight: 600;
+        }
+        
+        .cta {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .cta-text {
+            color: #666;
+            font-size: 0.92em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .cta-button {
+            background: #F4A91F;
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .cta-button:hover {
+            background: #E69A12;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 24px;
+                border-radius: 18px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .subtitle {
+                font-size: 1.05em;
+            }
+            
+            .message {
+                padding: 20px;
+                font-size: 0.98em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <span>🎯</span>
+            <span>Club21</span>
+        </div>
+        
+        <div class="free-badge">🎁 Ta vidéo perso est 100% GRATUITE</div>
+        
+        <h1>Merci ! 🎉</h1>
+        
+        <div class="subtitle">
+            Tes réponses sont bien reçues ✅<br>
+            On te prépare ta vidéo perso
+        </div>
+        
+        <div class="message">
+            <p>Merci d'avoir répondu à toutes les questions avec sincérité. <strong>Nous analysons en ce moment même tes réponses</strong> pour créer une vidéo et un plan d'entraînement <strong>100% personnalisés</strong> qui correspondent exactement à :</p>
+            <p style="margin-top: 15px;">✓ Ton niveau<br>
+            ✓ Tes objectifs<br>
+            ✓ Ton style de vie<br>
+            ✓ Tes contraintes</p>
+            <p style="margin-top: 15px;">Tu vas recevoir <strong>une vidéo unique</strong> que personne d'autre n'aura, <strong>100% gratuite</strong> 🎁. <strong>Par email et par message</strong>, tu auras tous les détails. On y va fort pour toi ! 💪</p>
+        </div>
+        
+        <div class="loading">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <div class="status">
+            Ton plan est en cours de création...
+        </div>
+        
+        <div class="cta">
+            <div class="cta-text">Tu peux fermer cette page.<br>On t'envoie ton plan par email et par message très bientôt.</div>
+        </div>
+    </div>
+    
+    <script>
+        // La livraison de la vidéo/du plan se fait maintenant côté serveur (Make),
+        // pas via un minuteur dans ce navigateur — ça marche même si la page est fermée.
+        // Aucune action nécessaire ici : Make enverra le lien direct par WhatsApp/email.
+    </script>
+</body>
+</html>
