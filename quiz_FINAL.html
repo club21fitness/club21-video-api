@@ -437,6 +437,19 @@ function getOrCreateId(storage, key){
 const visitorId = getOrCreateId(localStorage, 'club21_visitor_id');   // stable sur cet appareil/navigateur (= "répondant unique")
 const sessionId = getOrCreateId(sessionStorage, 'club21_session_id'); // un nouveau par visite/onglet
 
+const SRC = (new URLSearchParams(location.search).get('src')||'').trim().toLowerCase();
+
+// ?src=camron → vidéos de QUESTIONS de Camron (Amelia = défaut, inchangé)
+if (SRC === 'camron') {
+  const CB = "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/camron/";
+  CONFIG.videos = {
+    intro: CB+"intro.mov", prenom: CB+"intro.mov", age: CB+"age.mov", taille: CB+"taille.mov",
+    poids: CB+"poids.mov", niveau: CB+"niveau.mov", sexe: CB+"sexe.mov", objectif: CB+"objectif.mov",
+    physique: CB+"physique.mov", lieu: CB+"lieu.mov", seances: CB+"seances.mov", blessure: CB+"blessure.mov",
+    nourriture: CB+"nourriture.mov", sommeil: CB+"sommeil.mov", contact: CB+"contact.mov"
+  };
+}
+
 function sendEvent(event, payload){
   if(!CONFIG.webhookUrl) return;
   // FLATTEN le payload pour que Make détecte tous les champs
@@ -759,7 +772,7 @@ async function callGenerateVideo(answers) {
     const response = await fetch('/.netlify/functions/generate-video-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers })
+      body: JSON.stringify({ answers, src: SRC })
     });
     
     const data = await response.json();
@@ -787,6 +800,7 @@ async function finish(){
     answers.videoUrl = videoUrl;
     console.log('📹 URL vidéo ajoutée aux réponses');
   }
+  answers.src = SRC;
   
   // Envoyer les réponses + URL vidéo à Make
   sendEvent('quiz_submission', answers);
