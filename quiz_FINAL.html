@@ -448,6 +448,9 @@ if (SRC === 'camron') {
     physique: CB+"physique.mov", lieu: CB+"lieu.mov", seances: CB+"seances.mov", blessure: CB+"blessure.mov",
     nourriture: CB+"nourriture.mov", sommeil: CB+"sommeil.mov", contact: CB+"contact.mov"
   };
+  // Camron : sa vidéo demande combien de séances la personne VEUT faire
+  const _sq = STEPS.find(s => s.id === 'seances');
+  if (_sq) _sq.title = 'Combien de séances par semaine tu veux faire ?';
 }
 
 function sendEvent(event, payload){
