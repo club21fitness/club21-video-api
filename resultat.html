@@ -1,426 +1,192 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ton Plan Personnalisé - Club21</title>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root{
+            --cream:#FBF5EC;
+            --ink:#33251C;
+            --inksoft:#8A7663;
+            --orange:#E8613C;
+            --orange-d:#C94F2C;
+            --yellow:#F7C948;
+            --line:#EADFCF;
         }
-        
+        * { margin:0; padding:0; box-sizing:border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: white;
+            background: #fff;
             padding: 0;
             margin: 0;
         }
-        
+
         .container {
             max-width: 100%;
             margin: 0;
-            background: white;
+            background: var(--cream);
             border-radius: 0;
             padding: 40px;
             box-shadow: none;
         }
-        
+
         /* === CURSEUR ANIMÉ (SOURIS) === */
-        .cursor {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0;
-        }
-        
-        .cursor img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .cursor.active {
-            opacity: 1;
-            animation: moveMouse 60s ease-in-out forwards;
-        }
-        
+        .cursor { position:fixed; width:32px; height:32px; pointer-events:none; z-index:9999; opacity:0; }
+        .cursor img { width:100%; height:100%; object-fit:contain; }
+        .cursor.active { opacity:1; animation: moveMouse 60s ease-in-out forwards; }
         @keyframes moveMouse {
-            0% { left: 50px; top: 100px; }
-            5% { left: 80px; top: 120px; }
-            10% { left: 120px; top: 140px; }
-            15% { left: 100px; top: 180px; }
-            20% { left: 140px; top: 160px; }
-            25% { left: 250px; top: 280px; }
-            30% { left: 280px; top: 300px; }
-            35% { left: 350px; top: 320px; }
-            40% { left: 380px; top: 350px; }
-            45% { left: 300px; top: 400px; }
-            50% { left: 250px; top: 450px; }
-            55% { left: 350px; top: 480px; }
-            60% { left: 280px; top: 520px; }
-            65% { left: 200px; top: 580px; }
-            70% { left: 320px; top: 620px; }
-            75% { left: 250px; top: 650px; }
-            80% { left: 300px; top: 700px; }
-            85% { left: 180px; top: 720px; }
-            90% { left: 220px; top: 750px; }
-            95% { left: 150px; top: 780px; }
-            100% { left: 50px; top: 100px; }
+            0% { left:50px; top:100px; } 10% { left:120px; top:140px; } 20% { left:140px; top:160px; }
+            30% { left:280px; top:300px; } 40% { left:380px; top:350px; } 50% { left:250px; top:450px; }
+            60% { left:280px; top:520px; } 70% { left:320px; top:620px; } 80% { left:300px; top:700px; }
+            90% { left:220px; top:750px; } 100% { left:50px; top:100px; }
         }
-        
+
         /* === SECTION TOP === */
-        .top-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 50px;
-            gap: 40px;
-            position: relative;
-        }
-        
-        .profile-left {
-            flex: 1;
-            padding-right: 180px;
-        }
-        
-        .logo {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo span {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        .profile-info {
-            line-height: 1.8;
-            font-size: 0.95em;
-        }
-        
-        .profile-info div {
-            display: flex;
-            align-items: center;
-        }
-        
-        .profile-label {
-            font-weight: 400;
-            color: #333;
-            min-width: 100px;
-            font-size: 0.9em;
-        }
-        
-        .profile-value {
-            font-weight: 700;
-            color: #333;
-        }
-        
-        /* PETITE BULLE VIDÉO */
-        .video-bubble {
-            flex: 0 0 180px;
-            text-align: center;
-            position: absolute;
-            top: 40px;
-            right: 20px;
-        }
-        
+        .top-section { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:50px; gap:40px; position:relative; }
+        .profile-left { flex:1; padding-right:180px; }
+        .logo { font-size:1.2em; margin-bottom:15px; display:flex; align-items:center; gap:10px; }
+        .logo span { font-weight:bold; font-size:1.1em; }
+        .profile-info { line-height:1.8; font-size:0.95em; }
+        .profile-info div { display:flex; align-items:center; }
+        .profile-label { font-weight:400; color:var(--inksoft); min-width:100px; font-size:0.9em; }
+        .profile-value { font-weight:700; color:var(--ink); }
+
+        /* PETITE BULLE VIDÉO (la vidéo reste TOUJOURS dans le rond) */
+        .video-bubble { flex:0 0 180px; text-align:center; position:absolute; top:40px; right:20px; }
         .video-player-small {
-            width: 180px;
-            height: 180px;
-            background: black;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width:180px; height:180px; background:black; border-radius:50%;
+            overflow:hidden; display:flex; align-items:center; justify-content:center;
+            margin:0 auto; box-shadow:0 5px 15px rgba(0,0,0,0.2); position:relative;
         }
-        
-        .video-player-small video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .video-player-small video { width:100%; height:100%; object-fit:cover; }
+        /* petit bouton lecture par-dessus le rond */
+        .bubble-play {
+            position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; z-index:2;
         }
-        
-        /* === SECTION MILIEU - IMAGES AVANT/APRÈS === */
-        .body-transformation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 50px;
-            flex-wrap: wrap;
+        .bubble-play span {
+            width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.92);
+            display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,.3);
         }
-        
-        .body-image-box {
-            text-align: center;
+        .bubble-play span::after {
+            content:""; border-style:solid; border-width:9px 0 9px 15px;
+            border-color:transparent transparent transparent var(--ink); margin-left:3px;
         }
-        
-        .body-image {
-            width: 200px;
-            height: 300px;
-            background: #f0f0f0;
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .body-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .arrow-divider {
-            font-size: 3em;
-            color: #333;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* === SECTION BAS - DONNÉES === */
-        .data-section {
-            margin-bottom: 50px;
-        }
-        
-        .data-title {
-            font-size: 1.3em;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 30px;
-            letter-spacing: 0.5px;
-        }
-        
-        .data-items {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        
-        .data-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .data-label {
-            font-weight: 600;
-            color: #333;
-            font-size: 1.05em;
-            min-width: 200px;
-        }
-        
-        .data-content {
-            flex: 1;
-            max-width: 400px;
-        }
-        
-        .data-value {
-            font-weight: 600;
-            color: #333;
-            text-align: right;
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #e8f5e9 100%);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .data-answer {
-            color: #666;
-            font-size: 0.95em;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-        
-        /* === CTA SECTION === */
+
+        /* === MILIEU - AVANT/APRÈS === */
+        .body-transformation { display:flex; justify-content:center; align-items:center; gap:30px; margin-bottom:50px; flex-wrap:wrap; }
+        .body-image-box { text-align:center; }
+        .body-image { width:200px; height:300px; background:#f0f0f0; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+        .body-image img { width:100%; height:100%; object-fit:cover; }
+        .body-caption { margin-top:8px; font-weight:700; color:var(--ink); font-size:.95em; letter-spacing:.5px; }
+        .arrow-divider { font-size:3em; color:var(--orange); font-weight:bold; display:flex; align-items:center; }
+
+        /* === BAS - DONNÉES === */
+        .data-section { margin-bottom:20px; }
+        .data-title { font-size:1.3em; font-weight:700; text-align:center; margin-bottom:30px; letter-spacing:0.5px; color:var(--ink); }
+        .data-items { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+        .data-item { background:#fff; border-radius:14px; padding:18px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+        .data-item-icon { font-size:1.4em; margin-bottom:8px; }
+        .data-label { font-weight:700; color:var(--ink); font-size:.85em; margin-bottom:6px; }
+        .data-content { width:100%; }
+        .data-value { font-weight:700; color:var(--orange); margin-bottom:6px; font-size:0.85em; }
+        .progress-bar { width:100%; height:8px; background:var(--line); border-radius:4px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--orange); }
+        .data-answer { color:var(--inksoft); font-size:0.85em; font-weight:500; }
+
+        /* === CTA SECTION (couleurs DA + apparition progressive, aucun vide au départ) === */
         .cta-section {
-            background: #000;
-            border-radius: 12px;
-            padding: 40px;
+            background: var(--cream);
+            border-radius: 20px;
+            padding: 34px 26px;
             text-align: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
+            margin-top: 40px;
+            border-top: 3px solid var(--orange);
+            display: none;               /* caché au début → pas d'espace vide, la page est "coupée" */
         }
-        
-        .cta-section.visible {
-            opacity: 1;
-            pointer-events: auto;
+        .cta-section.visible { display:block; animation: ctaReveal .6s ease; }
+        @keyframes ctaReveal { from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none} }
+        .cta-section h2 { color:var(--ink); margin-bottom:8px; font-size:1.5em; }
+        .cta-section > p.cta-sub { color:var(--inksoft); line-height:1.6; margin-bottom:22px; font-size:.95em; }
+        .cta-cards { display:flex; flex-direction:column; gap:14px; max-width:520px; margin:0 auto; }
+        .cta-card {
+            background:#fff; border-radius:16px; padding:22px; text-align:left; text-decoration:none;
+            display:block; transition:all .2s ease; box-shadow:0 8px 22px -14px rgba(51,37,28,.4);
         }
-        
-        .cta-section h2 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.6em;
-        }
-        
-        .cta-section p {
-            color: white;
-            line-height: 1.8;
-            margin-bottom: 25px;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .cta-button {
-            padding: 15px 40px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid #e74c3c;
-            cursor: pointer;
-            font-size: 1em;
-            min-width: 220px;
-            background: white;
-            color: #000;
-        }
-        
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
-            background: #f5f5f5;
-        }
-        
+        .cta-card.primary { border:2px solid var(--orange); }
+        .cta-card:hover { transform:translateY(-2px); box-shadow:0 12px 26px -14px rgba(51,37,28,.5); }
+        .cta-card-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:2px; }
+        .cta-card-title { font-weight:800; font-size:1.05em; color:var(--ink); }
+        .cta-card-price { font-weight:800; font-size:.95em; color:var(--orange); flex:0 0 auto; white-space:nowrap; }
+        .cta-plabel { color:var(--inksoft); font-size:.72em; margin-bottom:10px; }
+        .cta-card ul { margin:6px 0 0; padding-left:0; list-style:none; font-size:.85em; line-height:1.9; color:var(--inksoft); }
+        .cta-card ul li { position:relative; padding-left:22px; }
+        .cta-card ul li::before { content:"✓"; position:absolute; left:0; font-weight:800; color:var(--orange); }
+        .cta-card-note { margin:10px 0 0; font-size:.8em; line-height:1.55; color:#9a8873; }
+        .cta-go { margin-top:14px; display:block; text-align:center; background:var(--orange); color:#fff; font-weight:800; padding:13px; border-radius:10px; text-decoration:none; transition:background .2s ease; }
+        .cta-go:hover { background:var(--orange-d); }
+        .cta-go.ghost { background:transparent; color:var(--ink); border:1.5px solid var(--line); }
+        .cta-go.ghost:hover { background:rgba(51,37,28,.04); }
+        .cta-guarantee { margin-top:18px; font-size:0.9em; color:#2E9E6B; font-weight:600; }
+
         /* === RESPONSIVE === */
         @media (max-width: 1024px) {
-            .container {
-                padding: 20px;
-                margin: 0;
-                border-radius: 0;
-                max-width: 100%;
-            }
-            
-            .profile-left {
-                padding-right: 160px;
-            }
-            
-            .top-section {
-                flex-direction: column;
-                margin-bottom: 30px;
-                gap: 20px;
-            }
-            
-            .video-bubble {
-                position: absolute;
-                top: 20px;
-                right: 10px;
-                width: auto;
-            }
-            
-            .video-player-small {
-                width: 140px;
-                height: 140px;
-                margin: 0;
-            }
-            
-            /* MOBILE: Images restent horizontales */
-            .body-transformation {
-                flex-direction: row;
-                gap: 15px;
-                justify-content: center;
-            }
-            
-            .body-image-box {
-                width: auto;
-            }
-            
-            .body-image {
-                width: 140px;
-                height: 210px;
-                margin: 0;
-            }
-            
-            .arrow-divider {
-                font-size: 1.8em;
-            }
-            
-            .data-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .data-label {
-                min-width: auto;
-                margin-bottom: 10px;
-                font-size: 0.9em;
-            }
-            
-            .data-content {
-                width: 100%;
-                max-width: none;
-            }
-            
-            .data-value {
-                text-align: left;
-            }
-            
-            .cta-buttons {
-                flex-direction: column;
-            }
-            
-            .cta-button {
-                min-width: 100%;
-            }
+            .container { padding:20px; margin:0; border-radius:0; max-width:100%; }
+            .profile-left { padding-right:150px; }
+            .top-section { flex-direction:column; margin-bottom:30px; gap:20px; }
+            .video-bubble { position:absolute; top:10px; right:6px; width:auto; }
+            .video-player-small { width:130px; height:130px; margin:0; }
+            .bubble-play span { width:38px; height:38px; }
+            .body-transformation { flex-direction:row; gap:15px; justify-content:center; }
+            .body-image { width:140px; height:210px; margin:0; }
+            .arrow-divider { font-size:1.8em; }
+            .data-items { grid-template-columns:1fr; }
+            .cta-buttons { flex-direction:column; }
+            .cta-button { min-width:100%; }
         }
-        
-        /* DESKTOP: Images en horizontal */
         @media (min-width: 1025px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .body-transformation {
-                flex-direction: row;
-                gap: 40px;
-            }
-            
-            .body-image {
-                width: 200px;
-                height: 300px;
-            }
-            
-            .arrow-divider {
-                font-size: 3em;
-            }
+            .container { max-width:100%; }
+            .body-transformation { flex-direction:row; gap:40px; }
+            .body-image { width:280px; height:420px; }
+            .arrow-divider { font-size:3em; }
         }
+
+        /* === 1er ecran sans scroll (mobile) + CTA impossible a louper === */
+        .hero { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; justify-content:center; }
+        @media (max-width:1024px){
+            .container{ padding:0 14px !important; }
+            .hero{ justify-content:space-between !important; padding:14px 0 18px !important; }
+            .logo{ margin-bottom:8px !important; }
+            .top-section{ margin-bottom:6px !important; gap:10px !important; }
+            .profile-info{ line-height:1.45 !important; font-size:.9em !important; }
+            .profile-left{ padding-right:132px !important; }
+            .video-player-small{ width:106px !important; height:106px !important; }
+            .body-transformation{ margin-bottom:8px !important; gap:8px !important; }
+            .arrow-divider{ font-size:1.35em !important; }
+            .body-image{ width:156px !important; height:234px !important; }
+            .body-caption{ font-size:.78em !important; margin-top:4px !important; }
+            .data-section{ margin-bottom:0 !important; }
+            .data-title{ margin-bottom:8px !important; font-size:1.0em !important; }
+            .data-items{ gap:7px !important; }
+            .data-item{ padding:9px !important; }
+            .data-item-icon{ font-size:1.1em !important; margin-bottom:3px !important; }
+            .data-value{ font-size:.8em !important; margin-bottom:4px !important; }
+            .data-answer{ font-size:.8em !important; }
+        }
+        .cta-section.visible{ display:block; animation: ctaReveal .5s ease, ctaGlow 1.15s ease .2s 2; }
+        @keyframes ctaGlow { 0%,100%{ box-shadow:0 0 0 0 rgba(232,97,60,0);} 50%{ box-shadow:0 0 0 12px rgba(232,97,60,.30);} }
     </style>
 </head>
 <body>
     <!-- CURSEUR ANIMÉ (SOURIS) -->
     <div class="cursor" id="cursor">
-        <img src="cursor.png" alt="cursor" width="32" height="32" style="width: 32px; height: 32px;">
+        <img src="cursor.png" alt="cursor" width="32" height="32" style="width:32px; height:32px;">
     </div>
-    
+
     <div class="container">
+      <div class="hero">
         <!-- TOP: PROFIL + VIDEO BULLE -->
         <div class="top-section">
             <div class="profile-left">
@@ -429,160 +195,186 @@
                     <span id="prenomDisplay">Guillaume</span>
                 </div>
                 <div class="profile-info">
-                    <div>
-                        <span class="profile-label">ÂGE :</span>
-                        <span class="profile-value" id="ageDisplay">25 - 34 ANS</span>
-                    </div>
-                    <div>
-                        <span class="profile-label">TAILLE :</span>
-                        <span class="profile-value" id="tailleDisplay">180 CM</span>
-                    </div>
-                    <div>
-                        <span class="profile-label">POIDS :</span>
-                        <span class="profile-value" id="poidsDisplay">90 KG</span>
-                    </div>
-                    <div>
-                        <span class="profile-label">OBJECTIF :</span>
-                        <span class="profile-value" id="objectifDisplay">MIX COMPLET</span>
-                    </div>
-                    <div>
-                        <span class="profile-label">NIVEAU :</span>
-                        <span class="profile-value" id="niveauDisplay">INTERMÉDIAIRE</span>
-                    </div>
+                    <div><span class="profile-label">ÂGE :</span><span class="profile-value" id="ageDisplay">25 - 34 ANS</span></div>
+                    <div><span class="profile-label">TAILLE :</span><span class="profile-value" id="tailleDisplay">180 CM</span></div>
+                    <div><span class="profile-label">POIDS :</span><span class="profile-value" id="poidsDisplay">90 KG</span></div>
+                    <div><span class="profile-label">OBJECTIF :</span><span class="profile-value" id="objectifDisplay">MIX COMPLET</span></div>
+                    <div><span class="profile-label">NIVEAU :</span><span class="profile-value" id="niveauDisplay">INTERMÉDIAIRE</span></div>
                 </div>
             </div>
-            
+
             <!-- PETITE BULLE VIDÉO EN HAUT À DROITE -->
             <div class="video-bubble">
                 <div class="video-player-small">
-                    <video id="videoPlayer" controls></video>
+                    <!-- playsinline / webkit-playsinline : la vidéo reste DANS le rond, jamais en plein écran -->
+                    <video id="videoPlayer" playsinline="" webkit-playsinline="" preload="auto" disablepictureinpicture=""></video>
+                    <div class="bubble-play" id="bubblePlay"><span></span></div>
                 </div>
             </div>
         </div>
-        
+
         <!-- MILIEU: 2 IMAGES AVANT/APRÈS -->
         <div class="body-transformation">
             <div class="body-image-box">
-                <div class="body-image">
-                    <img id="beforeImage" src="" alt="Avant">
-                </div>
+                <div class="body-image"><img id="beforeImage" src="" alt="Avant"></div>
+                <div class="body-caption">AVANT</div>
             </div>
-            
             <div class="arrow-divider">→</div>
-            
             <div class="body-image-box">
-                <div class="body-image">
-                    <img id="afterImage" src="" alt="Après">
-                </div>
+                <div class="body-image"><img id="afterImage" src="" alt="Après"></div>
+                <div class="body-caption">APRÈS</div>
             </div>
         </div>
-        
+
         <!-- BAS: TES DONNÉES PERSONNELLES -->
         <div class="data-section">
             <div class="data-title">TES DONNÉES PERSONNELLES</div>
             <div class="data-items">
                 <div class="data-item">
-                    <div class="data-label">NIVEAU DE SOMMEIL</div>
+                    <div class="data-item-icon">😴</div>
+                    <div class="data-label">SOMMEIL</div>
                     <div class="data-content">
                         <div class="data-value" id="sommeilScore">50%</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="sommeilBar"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="sommeilBar"></div></div>
                         <div class="data-answer" id="sommeilAnswer">Moyen</div>
                     </div>
                 </div>
-                
                 <div class="data-item">
+                    <div class="data-item-icon">🍽️</div>
                     <div class="data-label">NOURRITURE</div>
-                    <div class="data-content">
-                        <div class="data-answer" id="nourritureAnswer">Je mange plutôt équilibré</div>
-                    </div>
+                    <div class="data-content"><div class="data-answer" id="nourritureAnswer">Je mange plutôt équilibré</div></div>
                 </div>
-                
                 <div class="data-item">
+                    <div class="data-item-icon" style="filter:sepia(1) saturate(2) hue-rotate(-15deg) brightness(0.95)">🩹</div>
                     <div class="data-label">BLESSURE</div>
-                    <div class="data-content">
-                        <div class="data-answer" id="blessureAnswer">Aucune</div>
-                    </div>
+                    <div class="data-content"><div class="data-answer" id="blessureAnswer">Aucune</div></div>
                 </div>
             </div>
         </div>
-        
-        <!-- CTA (caché au départ) -->
+
+      </div><!-- /hero -->
+
+        <!-- CTA (caché au départ, apparaît après 1 min) -->
         <div class="cta-section" id="ctaSection">
-            <h2>Prêt à commencer ta transformation ?</h2>
-            <p>Tu as maintenant un plan clair et personnalisé. Choisis l'option qui te correspond :</p>
-            <div class="cta-buttons">
-                <a href="#club21" class="cta-button">
-                    👥 Rejoindre Club21 (~21€/mois)
-                </a>
-                <a href="#appel" class="cta-button">
-                    📞 Réserver un Appel Gratuit<br>
-                    <small style="font-size: 0.75em; opacity: 0.9;">Suivi Personnalisé avec un Coach</small>
-                </a>
+            <h2>Ton plan est prêt 🎯</h2>
+            <p class="cta-sub">Choisis l'option qui te correspond :</p>
+            <div class="cta-cards">
+                <div class="cta-card primary">
+                    <div class="cta-card-head">
+                        <span class="cta-card-title">👥 Club21</span>
+                        <span class="cta-card-price">21€</span>
+                    </div>
+                    <div class="cta-plabel">paiement unique · plus d'une centaine de femmes transformées 🔥</div>
+                    <ul>
+                        <li>Sport + nutrition personnalisés</li>
+                        <li>Communauté privée + soutien au quotidien</li>
+                        <li>Accès immédiat</li>
+                    </ul>
+                    <a href="https://club21.fr/challenge" id="ctaJoin" class="cta-go">Rejoindre le Club21 →</a>
+                </div>
+                <div class="cta-card">
+                    <div class="cta-card-head">
+                        <span class="cta-card-title">📞 Appel avec un coach</span>
+                        <span class="cta-card-price">Offert</span>
+                    </div>
+                    <div class="cta-plabel">45 min en visio · sur sélection</div>
+                    <ul>
+                        <li>Un coach, pas un commercial</li>
+                        <li>Ta stratégie perso, pas du blabla</li>
+                    </ul>
+                    <p class="cta-card-note">⚠️ Pas un appel de renseignement : réservé aux personnes prêtes à investir sur elles. Pas prête à mettre les moyens ? Prends le Club21.</p>
+                    <a href="https://calendly.com/club21fitness/appel" target="_blank" rel="noopener" class="cta-go ghost">Réserver mon appel →</a>
+                </div>
             </div>
-            <p style="margin-top: 25px; font-size: 0.9em; opacity: 0.7;">
-                ✅ Garantie "Transformé ou remboursé" sur tous nos plans
-            </p>
+            <p class="cta-guarantee">✅ Garantie « Transformée ou remboursée »</p>
         </div>
     </div>
-    
+
     <script>
-        const baseUrl = "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/club21-profile-videos/segments";
-        
+        /* ========================================================================
+           À CONFIGURER : le bouton "Rejoindre Club21" renvoie vers la PAGE CHALLENGE
+           (pas Stripe). Remplace l'URL ci-dessous par ta vraie page challenge.
+           ======================================================================== */
+        const CHALLENGE_URL = "https://club21.fr/challenge";  // <-- page challenge Shopify
+        const CALENDLY_URL  = "https://calendly.com/club21fitness/appel";
+        const CTA_DELAY_MS  = 60000;                          // 1 min
+
+        // Images de corps (mêmes assets Supabase que le quiz)
+        const IMG_BASE = "https://sseusjrbthyhhtvfknjz.supabase.co/storage/v1/object/public/videos/";
+        const BODY_IMAGES = {
+            homme: {
+                curvy:  [IMG_BASE+"HOMME%20CURVY%201.png", IMG_BASE+"HOMME%20CURVY%202.png", IMG_BASE+"HOMME%20CURVY%204.png"],
+                skinny: [IMG_BASE+"HOMME%20SKINNY%201.png", IMG_BASE+"HOMME%20SKINNY%202.png", IMG_BASE+"HOMME%20SKINNY%203.png"],
+                mix:    [IMG_BASE+"HOMME%20MIX%201.png", IMG_BASE+"HOMME%20MIX%202.png", IMG_BASE+"HOMME%20MIX%203.png"]
+            },
+            femme: {
+                curvy:  [IMG_BASE+"FEMME%20CURVY%201.png", IMG_BASE+"FEMME%20CURVY%202.png", IMG_BASE+"FEMME%20CURVY%204.png"],
+                skinny: [IMG_BASE+"FEMME%20SKINNY%201.png", IMG_BASE+"FEMME%20SKINNY%202.png", IMG_BASE+"FEMME%20SKINNY%203.png"],
+                mix:    [IMG_BASE+"FEMME%20MIX%201.png", IMG_BASE+"FEMME%20MIX%202.png", IMG_BASE+"FEMME%20MIX%203.png"]
+            }
+        };
+
         function getQuizAnswers() {
-            const urlParams = new URLSearchParams(window.location.search);
+            const p = new URLSearchParams(window.location.search);
+            const ls = (k) => { try { return localStorage.getItem(k); } catch(e){ return null; } };
             return {
-                prenom: urlParams.get('prenom') || localStorage.getItem('quiz_prenom') || 'Guillaume',
-                sexe: urlParams.get('sexe') || localStorage.getItem('quiz_sexe') || 'homme',
-                age: urlParams.get('age') || localStorage.getItem('quiz_age') || '25 - 34 ans',
-                niveau: urlParams.get('niveau') || localStorage.getItem('quiz_niveau') || 'Intermédiaire',
-                physique: urlParams.get('physique') || localStorage.getItem('quiz_physique') || 'Composition à ajuster',
-                objectif: urlParams.get('objectif') || localStorage.getItem('quiz_objectif') || 'Mix',
-                lieu: urlParams.get('lieu') || localStorage.getItem('quiz_lieu') || 'En salle',
-                seances: urlParams.get('seances') || localStorage.getItem('quiz_seances') || '4',
-                sommeil: urlParams.get('sommeil') || localStorage.getItem('quiz_sommeil') || '50',
-                nourriture: urlParams.get('nourriture') || localStorage.getItem('quiz_nourriture') || 'Je mange plutôt équilibré',
-                blessure: JSON.parse(urlParams.get('blessure') || localStorage.getItem('quiz_blessure') || '["Aucune"]'),
-                poids: parseInt(urlParams.get('poids') || localStorage.getItem('quiz_poids') || '90'),
-                taille: parseInt(urlParams.get('taille') || localStorage.getItem('quiz_taille') || '180')
+                prenom:  p.get('prenom')  || ls('quiz_prenom')  || 'Guillaume',
+                sexe:    p.get('sexe')    || ls('quiz_sexe')    || 'homme',
+                age:     p.get('age')     || ls('quiz_age')     || '25 - 34 ans',
+                niveau:  p.get('niveau')  || ls('quiz_niveau')  || 'Intermédiaire',
+                physique:p.get('physique')|| ls('quiz_physique')|| 'physique_1',
+                objectif:p.get('objectif')|| ls('quiz_objectif')|| 'Mix',
+                lieu:    p.get('lieu')    || ls('quiz_lieu')    || 'En salle',
+                seances: p.get('seances') || ls('quiz_seances') || '4',
+                sommeil: p.get('sommeil') || ls('quiz_sommeil') || '50',
+                nourriture: p.get('nourriture') || ls('quiz_nourriture') || 'Je mange plutôt équilibré',
+                blessure: JSON.parse(p.get('blessure') || ls('quiz_blessure') || '["Aucune"]'),
+                poids:   parseInt(p.get('poids')  || ls('quiz_poids')  || '90'),
+                taille:  parseInt(p.get('taille') || ls('quiz_taille') || '180')
             };
         }
-        
-        // Construit l'URL Cloudinary unique (11 segments collés, zéro latence)
-        function buildCloudinaryVideoUrl(answers) {
-            const ageMap = {
-                '18 - 24 ans': '18_24', '25 - 34 ans': '25_34',
-                '35 - 44 ans': '35_44', '45 - 54 ans': '45_plus', '+ de 55 ans': '45_plus'
-            };
-            const niveauMap = {
-                'Débutante': 'debutant', 'Intermédiaire': 'intermediaire', 'Confirmée': 'avance'
-            };
-            const objectifMapFemme = {
-                'Mincir': 'mincir_f', 'Me galber / me tonifier': 'galber_f', 'Mix complet': 'tonifier_f'
-            };
-            const objectifMapHomme = {
-                'Sécher / mincir': 'perdre_poids_h', 'Prendre du muscle': 'muscle_h', 'Mix complet': 'recomposition_h'
-            };
-            const lieuMap = { 'En salle de sport': 'salle', 'salle': 'salle', 'À domicile': 'maison', 'maison': 'maison' };
-            const seancesMap = { '0 (je débute)': '3', '1 à 2': '3', '3 à 4': '4', '5 et +': '6' };
-            const nourritureMap = {
-                'Je mange plutôt équilibré': 'equilibre',
-                'Je grignote dès que je stresse': 'stress',
-                "J'ai des fringales le soir": 'fringales_soir',
-                'Je mange mes émotions': 'emotions',
-                "C'est compliqué": 'complique'
-            };
 
+        // Image "corps de rêve" (APRÈS)
+        const DREAM_BODY = { femme: IMG_BASE+"FEMME%20DREAM%20BODY.png", homme: IMG_BASE+"HOMME%20DREAM%20BODY.png" };
+
+        // Même logique que le quiz : quelle catégorie d'images lui a été montrée (= son corps actuel)
+        function getBodyCategory(sex, objective) {
+            const o = objective || '';
+            if (sex === 'femme') {
+                if (o.includes('Mincir')) return 'curvy';
+                if (o.includes('galber') || o.includes('tonifier')) return 'skinny';
+                return 'mix';
+            } else {
+                if (o.includes('Sécher') || o.includes('mincir')) return 'curvy';
+                if (o.includes('muscle')) return 'skinny';
+                return 'mix';
+            }
+        }
+
+        // AVANT = l'image de corps qu'elle a choisie dans le quiz · APRÈS = la DREAM BODY
+        function bodyPair(sex, objectif, physiqueRaw) {
+            sex = (sex === 'homme') ? 'homme' : 'femme';
+            let idx = parseInt(String(physiqueRaw).replace(/\D/g, ''), 10);
+            if (isNaN(idx)) idx = 0;
+            idx = Math.max(0, Math.min(2, idx));
+            const cat = getBodyCategory(sex, objectif);
+            const arr = BODY_IMAGES[sex][cat] || [];
+            return { avant: arr[idx] || arr[0] || '', apres: DREAM_BODY[sex] };
+        }
+
+        // Construit l'URL Cloudinary (secours si le lien n'est pas passé en paramètre)
+        function buildCloudinaryVideoUrl(answers) {
+            const ageMap = { '18 - 24 ans':'18_24','25 - 34 ans':'25_34','35 - 44 ans':'35_44','45 - 54 ans':'45_plus','+ de 55 ans':'45_plus' };
+            const niveauMap = { 'Débutante':'debutant','Intermédiaire':'intermediaire','Confirmée':'avance' };
+            const objectifMapFemme = { 'Mincir':'mincir_f','Me galber / me tonifier':'galber_f','Mix complet':'tonifier_f' };
+            const objectifMapHomme = { 'Sécher / mincir':'perdre_poids_h','Prendre du muscle':'muscle_h','Mix complet':'recomposition_h' };
+            const lieuMap = { 'En salle de sport':'salle','salle':'salle','À domicile':'maison','maison':'maison' };
+            const seancesMap = { '0 (je débute)':'3','1 à 2':'3','3 à 4':'4','5 et +':'6' };
+            const nourritureMap = { 'Je mange plutôt équilibré':'equilibre','Je grignote dès que je stresse':'stress',"J'ai des fringales le soir":'fringales_soir','Je mange mes émotions':'emotions',"C'est compliqué":'complique' };
             const sexe = answers.sexe === 'homme' ? 'homme' : 'femme';
             const age = ageMap[answers.age] || '25_34';
             const niveau = niveauMap[answers.niveau] || 'intermediaire';
-
-            let objectif;
-            if (sexe === 'femme') objectif = objectifMapFemme[answers.objectif] || 'tonifier_f';
-            else objectif = objectifMapHomme[answers.objectif] || 'recomposition_h';
-
-            // Physique : catégorie déduite du sexe + objectif (curvy/skinny/mix), pas de l'index brut
+            let objectif = sexe === 'femme' ? (objectifMapFemme[answers.objectif] || 'tonifier_f') : (objectifMapHomme[answers.objectif] || 'recomposition_h');
             let physique;
             if (sexe === 'femme') {
                 if (answers.objectif && answers.objectif.includes('Mincir')) physique = 'composition_f';
@@ -593,110 +385,92 @@
                 else if (answers.objectif && answers.objectif.includes('muscle')) physique = 'mince_h';
                 else physique = 'equilibre';
             }
-
             const lieu = lieuMap[answers.lieu] || 'salle';
             const seances = seancesMap[answers.seances] || '4';
             const entrainement = `${lieu}_${sexe.charAt(0)}_${seances}`;
-
             const nourriture = nourritureMap[answers.nourriture] || 'equilibre';
-
             let sommeil = 'moyen';
-            const sommeilVal = parseInt(answers.sommeil, 10) || 50;
-            if (sommeilVal <= 33) sommeil = 'tres_mal';
-            else if (sommeilVal >= 67) sommeil = 'tres_bien';
-
+            const sv = parseInt(answers.sommeil, 10) || 50;
+            if (sv <= 33) sommeil = 'tres_mal'; else if (sv >= 67) sommeil = 'tres_bien';
             let blessure = 'aucune';
-            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') {
-                blessure = 'generique';
-            }
-
-            const segments = [
-                `segments:age:${age}`,
-                `segments:sexe:${sexe}`,
-                `segments:niveau:${niveau}`,
-                `segments:objectif:${objectif}`,
-                `segments:physique:${physique}`,
-                `segments:entrainement:${entrainement}`,
-                `segments:nourriture:${nourriture}`,
-                `segments:sommeil:${sommeil}`,
-                `segments:blessure:${blessure}`
-            ];
-
-            let transformations = 'w_1080,h_1920,c_pad,b_black';
-            for (const seg of segments) {
-                transformations += `/fl_splice,l_video:${seg},w_1080,h_1920,c_pad,b_black/fl_layer_apply`;
-            }
-
-            return `https://res.cloudinary.com/muai6pwk/video/upload/${transformations}/v1/segments/intro.mp4`;
+            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') blessure = 'generique';
+            const segments = [`segments:age:${age}`,`segments:sexe:${sexe}`,`segments:niveau:${niveau}`,`segments:objectif:${objectif}`,`segments:physique:${physique}`,`segments:entrainement:${entrainement}`,`segments:nourriture:${nourriture}`,`segments:sommeil:${sommeil}`,`segments:blessure:${blessure}`];
+            let t = 'w_1080,h_1920,c_pad,b_black';
+            for (const s of segments) t += `/fl_splice,l_video:${s},w_1080,h_1920,c_pad,b_black/fl_layer_apply`;
+            return `https://res.cloudinary.com/muai6pwk/video/upload/${t}/v1/segments/intro.mp4`;
         }
-        
-        // Plus besoin de classe de concaténation manuelle : Cloudinary livre
-        // déjà UNE seule vidéo (intro → outro), donc on charge juste l'URL.
-        function playVideo(videoElement, url) {
-            videoElement.src = url;
-            videoElement.load();
-            videoElement.play().catch(() => {});
-        }
-        
-        // === ANIMATION CURSEUR ===
-        function startCursorAnimation() {
-            const cursor = document.getElementById('cursor');
-            cursor.classList.add('active');
-        }
-        
+
+        function startCursorAnimation() { document.getElementById('cursor').classList.add('active'); }
+
         function renderData(answers) {
             document.getElementById('prenomDisplay').textContent = answers.prenom;
-            document.getElementById('ageDisplay').textContent = answers.age.toUpperCase();
+            document.getElementById('ageDisplay').textContent = String(answers.age).toUpperCase();
             document.getElementById('tailleDisplay').textContent = answers.taille + ' CM';
             document.getElementById('poidsDisplay').textContent = answers.poids + ' KG';
-            document.getElementById('objectifDisplay').textContent = answers.objectif.toUpperCase();
-            document.getElementById('niveauDisplay').textContent = answers.niveau.toUpperCase();
-            
-            document.getElementById('beforeImage').src = `https://via.placeholder.com/200x300/ccc/999?text=Avant`;
-            document.getElementById('afterImage').src = `https://via.placeholder.com/200x300/ccc/999?text=Après`;
-            
+            document.getElementById('objectifDisplay').textContent = String(answers.objectif).toUpperCase();
+            document.getElementById('niveauDisplay').textContent = String(answers.niveau).toUpperCase();
+
+            // AVANT / APRÈS : vraies images de corps selon ses choix
+            const pair = bodyPair(answers.sexe, answers.objectif, answers.physique);
+            const before = document.getElementById('beforeImage');
+            const after = document.getElementById('afterImage');
+            before.src = pair.avant;
+            after.src = pair.apres;
+
             // SOMMEIL
-            const sommeilVal = parseInt(answers.sommeil) || 50;
-            document.getElementById('sommeilScore').textContent = sommeilVal + '%';
-            document.getElementById('sommeilBar').style.width = sommeilVal + '%';
-            
+            const sv = parseInt(answers.sommeil) || 50;
+            document.getElementById('sommeilScore').textContent = sv + '%';
+            document.getElementById('sommeilBar').style.width = sv + '%';
             let sommeilLabel = 'Moyen';
-            if (sommeilVal <= 30) sommeilLabel = 'Très mal';
-            else if (sommeilVal >= 70) sommeilLabel = 'Très bien';
+            if (sv <= 30) sommeilLabel = 'Très mal'; else if (sv >= 70) sommeilLabel = 'Très bien';
             document.getElementById('sommeilAnswer').textContent = sommeilLabel;
-            
+
             // NOURRITURE
             document.getElementById('nourritureAnswer').textContent = answers.nourriture;
-            
+
             // BLESSURE
             let blessureText = 'Aucune';
-            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') {
-                blessureText = answers.blessure.join(', ');
-            }
+            if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') blessureText = answers.blessure.join(', ');
             document.getElementById('blessureAnswer').textContent = blessureText;
         }
-        
+
+        // Vidéo : reste TOUJOURS dans le rond (inline), petit bouton play par-dessus
+        function setupVideo(videoUrl) {
+            const v = document.getElementById('videoPlayer');
+            const play = document.getElementById('bubblePlay');
+            v.src = videoUrl;
+            v.setAttribute('playsinline', '');
+            v.setAttribute('webkit-playsinline', '');
+            v.muted = true;               // autoplay muet autorisé → l'image bouge dans le rond
+            v.load();
+            v.play().catch(() => {});
+            play.addEventListener('click', () => {
+                v.currentTime = 0;        // au clic sur play, la vidéo repart du début
+                v.muted = false;          // son activé, et ça reste dans le rond
+                play.style.display = 'none';
+                v.play().catch(() => {});
+            });
+            v.addEventListener('ended', () => { play.style.display = 'flex'; });
+        }
+
         function init() {
             const answers = getQuizAnswers();
-            // L'URL vidéo arrive directement dans le lien envoyé par Make (paramètre ?videoUrl=...).
-            // Si absente (lien incomplet), on la reconstruit ici à partir des réponses en secours.
-            const urlParams = new URLSearchParams(window.location.search);
-            const videoUrl = urlParams.get('videoUrl') || buildCloudinaryVideoUrl(answers);
-            
+            const p = new URLSearchParams(window.location.search);
+            const videoUrl = p.get('videoUrl') || buildCloudinaryVideoUrl(answers);
+
             renderData(answers);
-            
-            playVideo(document.getElementById('videoPlayer'), videoUrl);
-            
-            // Animer la souris au démarrage
+            setupVideo(videoUrl);
             startCursorAnimation();
-            
-            // CTA après 1 min
-            setTimeout(() => {
-                document.getElementById('ctaSection').classList.add('visible');
-            }, 60000);
+
+            // Liens des boutons
+            document.getElementById('ctaJoin').href = CHALLENGE_URL;
+
+            // CTA apparaît après 1 min (au début la page est "coupée", aucun vide)
+            setTimeout(() => { var cta = document.getElementById('ctaSection'); cta.classList.add('visible'); try { cta.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(e){ cta.scrollIntoView(); } }, CTA_DELAY_MS);
         }
-        
+
         window.addEventListener('load', init);
     </script>
-</body>
-</html>
+
+
+</body></html>
