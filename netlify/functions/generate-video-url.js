@@ -11,6 +11,10 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const answers = body.answers;
+    // ?src=camron → montage avec les segments de Camron (sinon Amelia par défaut)
+    const src = (body.src || (answers && answers.src) || '').toString().trim().toLowerCase();
+    const coach = src === 'camron' ? 'camron' : '';
+    const segRoot = coach ? ('segments:' + coach) : 'segments';
 
     if (!answers || !answers.age || !answers.sexe) {
       return {
@@ -121,24 +125,44 @@ exports.handler = async (event) => {
     const entrainement = `${lieu}_${sexe.charAt(0)}_${seances}`;
 
     // URL AVEC 9 SEGMENTS
-    const segments = [
-      `segments:age:${age}`,
-      `segments:sexe:${sexe}`,
-      `segments:niveau:${niveau}`,
-      `segments:objectif:${objectif}`,
-      `segments:physique:${physique}`,
-      `segments:entrainement:${entrainement}`,
-      `segments:nourriture:${nourriture}`,
-      `segments:sommeil:${sommeil}`,
-      `segments:blessure:${blessure}`
-    ];
+    // Segments du montage.
+    // Camron = fichiers a plat (segmentscamron<categorie><valeur>) + outro.
+    // Amelia = arborescence a dossiers (segments/<categorie>/<valeur>), sans outro.
+    let segments, introPath;
+    if (coach === 'camron') {
+      const p = 'segmentscamron';
+      segments = [
+        `${p}age${age}`,
+        `${p}sexe${sexe}`,
+        `${p}niveau${niveau}`,
+        `${p}objectif${objectif}`,
+        `${p}physique${physique}`,
+        `${p}entrainement${entrainement}`,
+        `${p}sommeil${sommeil}`,
+        `${p}blessure${blessure}`,
+        'segmentscamronoutro'
+      ];
+      introPath = 'segmentscamronintro.mp4';
+    } else {
+      segments = [
+        `segments:age:${age}`,
+        `segments:sexe:${sexe}`,
+        `segments:niveau:${niveau}`,
+        `segments:objectif:${objectif}`,
+        `segments:physique:${physique}`,
+        `segments:entrainement:${entrainement}`,
+        `segments:sommeil:${sommeil}`,
+        `segments:blessure:${blessure}`
+      ];
+      introPath = 'v1/segments/intro.mp4';
+    }
 
     let transformations = 'w_1080,h_1920,c_pad,b_black';
     for (const seg of segments) {
       transformations += `/fl_splice,l_video:${seg},w_1080,h_1920,c_pad,b_black/fl_layer_apply`;
     }
 
-    const videoUrl = `https://res.cloudinary.com/muai6pwk/video/upload/${transformations}/v1/segments/intro.mp4`;
+    const videoUrl = `https://res.cloudinary.com/muai6pwk/video/upload/${transformations}/${introPath}`;
 
     return {
       statusCode: 200,
