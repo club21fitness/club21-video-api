@@ -395,7 +395,7 @@
             let blessure = 'aucune';
             if (answers.blessure && answers.blessure.length > 0 && answers.blessure[0] !== 'Aucune') blessure = 'generique';
             const segments = [`segments:age:${age}`,`segments:sexe:${sexe}`,`segments:niveau:${niveau}`,`segments:objectif:${objectif}`,`segments:physique:${physique}`,`segments:entrainement:${entrainement}`,`segments:nourriture:${nourriture}`,`segments:sommeil:${sommeil}`,`segments:blessure:${blessure}`];
-            let t = 'w_1080,h_1920,c_pad,b_black';
+            let t = 'f_auto,q_auto,w_1080,h_1920,c_pad,b_black';
             for (const s of segments) t += `/fl_splice,l_video:${s},w_1080,h_1920,c_pad,b_black/fl_layer_apply`;
             return `https://res.cloudinary.com/muai6pwk/video/upload/${t}/v1/segments/intro.mp4`;
         }
@@ -456,7 +456,7 @@
         function init() {
             const answers = getQuizAnswers();
             const p = new URLSearchParams(window.location.search);
-            const videoUrl = p.get('videoUrl') || buildCloudinaryVideoUrl(answers);
+            let videoUrl = p.get('videoUrl') || buildCloudinaryVideoUrl(answers); if(videoUrl.indexOf('/video/upload/')>-1&&videoUrl.indexOf('q_auto')<0)videoUrl=videoUrl.replace('/video/upload/','/video/upload/f_auto,q_auto,');
 
             renderData(answers);
             setupVideo(videoUrl);
